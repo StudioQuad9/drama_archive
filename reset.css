@@ -1,0 +1,83 @@
+/* =========================
+   Base / Reset
+   ========================= */
+
+/* box-sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* document */
+html {
+  line-height: 1.1;
+}
+
+/* body */
+body {
+  margin: 0;
+}
+
+/* headings & paragraphs */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+/* lists */
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* definition list */
+dl,
+dt,
+dd {
+  margin: 0;
+}
+
+/* media */
+img,
+picture,
+video,
+canvas,
+svg,
+iframe {
+  display: block;
+  max-width: 100%;
+}
+
+/* form */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  box-sizing: border-box;
+}
+
+/* textarea */
+textarea {
+  resize: vertical;
+}
+
+button {
+  background: none;
+  border: none;
+}
