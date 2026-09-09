@@ -65,6 +65,11 @@ p {
   font-family: var(--sans-serif);
 }
 
+/* スマホのメニューボタン */
+.material-symbols-outlined {
+  color: #000000;
+}
+
 /* セリフ引用 */
 .quote {
   font-family: var(--serif);
