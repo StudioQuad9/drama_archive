@@ -1,0 +1,19 @@
+@mixin content-width(
+  $width: 90%,
+  $max-width: 1080px
+) {
+  width: $width;
+  max-width: $max-width;
+  // 要素を横方向の中央に配置する
+  margin-inline: auto;
+}
+
+$color-red: #5e71ea;
+
+.container {
+  @include content-width;
+  display: grid;
+  place-content: center;
+  height: 100vh;
+  background-color: $color-red;
+}
