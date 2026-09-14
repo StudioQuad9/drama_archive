@@ -1,82 +1,89 @@
-# 第6章　作品情報をデータへ分離する
+
+# 第6章　mapとpropsでカードを生成する
 
 ## 目的
 
-作品の内容と、画面の形を分けます。
+作品ごとに繰り返していたHTMLを、一つのDramaCardから生成します。
 
-## 1. データの形を決める
+## 1. DramaCard
 
-```js
-// src/data/dramas.js
-export const dramas = [
-  {
-    id: "true-detective",
-    title: "True Detective",
-    image: "/pict/truedetective.avif",
-    score: 10,
-    seasons: 4,
-    genre: ["Crime", "Mystery"],
-    year: 2014,
-    platform: "HBO",
-    featured: true,
-    large: false,
-    quote: "“The World needs bad men.”",
-    quoteBy: "Rust Cohle",
-    youtubeId: "jdu3hAAmFtk",
-    reviewTitle: "マスターピース",
-    review: [
-      "1シーズン完結型。シーズンごとに内容が大きく異なる。",
-      "どのシーズンも素晴らしいのだが、やはりシーズン1が別格。",
-    ],
-  },
-  {
-    id: "stranger-things",
-    title: "Stranger Things",
-    image: "/pict/strangerthings.avif",
-    score: 9,
-    seasons: 5,
-    genre: ["SF", "Juvenile"],
-    year: 2016,
-    platform: "NETFLIX",
-    featured: false,
-    large: false,
-    youtubeId: "6HkQ5ys3vEY",
-    reviewTitle: "三つ星レストランのジャンル全盛り丼",
-    review: ["NETFLIXの看板ドラマの1つ。加入したらまず観てほしい名作。"],
-  },
-];
+```jsx
+// src/components/drama/DramaCard.jsx
+
+export default function DramaCard({ drama, number, onSelect }) {
+  const genres = drama.genre.join(" · ");
+
+  return (
+    <article className={`drama-card ${drama.large ? "drama-card--large" : ""}`}>
+      <button
+        className="drama-card__button"
+        type="button"
+        onClick={() => onSelect(drama)}
+        aria-haspopup="dialog"
+      >
+        <div className="drama-card__image">
+          <img src={drama.image} alt="" />
+        </div>
+
+        <div className="drama-card__heading">
+          <h3>
+            <span className="drama-card__number">{String(number).padStart(2, "0")}</span>
+            {drama.title}
+          </h3>
+          <span className="score">{drama.score}/10</span>
+        </div>
+
+        <p className="information">
+          {drama.seasons} seasons / {genres}
+          <br />
+          {drama.year} / {drama.platform}
+        </p>
+      </button>
+    </article>
+  );
+}
 ```
 
-実際には、元HTMLにある全作品とレビュー全文を移します。文章を一つの長い文字列へ入れるより、段落の配列にすると表示方法を変更しやすくなります。
+カード全体を押せるようにする場合、クリック可能な`article`ではなく、中に`button`を置きます。これでTabキーとEnter・Spaceキーでも操作できます。
 
-## 2. IDの役割
+## 2. 一覧を生成する
 
-`id`はReactが一覧を識別するとき、モーダルで選択作品を識別するとき、将来URLを作るときに使えます。
+```jsx
+// src/components/drama/DramaList.jsx
+import DramaCard from "./DramaCard";
 
-タイトルをそのままIDにせず、半角英数の安定した値にします。
+export default function DramaList({ dramas, onSelect }) {
+  return (
+    <section id="dramas" aria-labelledby="dramas-title">
+      <h2 id="dramas-title" className="section-title">Dramas</h2>
 
-## 3. データに入れないもの
-
-次のような見た目の指定は、基本的にデータへ入れません。
-
-```js
-color: "yellow"
-fontSize: "24px"
-marginTop: "20px"
+      <div className="drama-list">
+        {dramas.map((drama, index) => (
+          <DramaCard
+            key={drama.id}
+            drama={drama}
+            number={index + 1}
+            onSelect={onSelect}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
 ```
 
-データは内容、SCSSは見た目を担当します。ただし、`featured`や`large`のような表示上の意味を示す値はデータとして持てます。
+`key`は画面には表示されません。Reactが各要素を区別するために使います。配列の順番が変わる可能性があるため、`index`ではなく`drama.id`を使います。
 
 ## 今日の確認
 
-- [ ] 全作品に重複しないIDがある
-- [ ] 作品情報と見た目の指定を分けた
-- [ ] レビュー全文が失われていない
-- [ ] データだけを見て内容を更新できる
+- [ ] 作品を追加するときHTMLを複製する必要がない
+- [ ] `map()`、`key`、propsの役割を説明できる
+- [ ] カードをTabキーで選択できる
+- [ ] 表示順をデータの順番で変更できる
 
 ## Git
 
 ```bash
 git add .
-git commit -m "Move drama content into structured data"
+git commit -m "Render drama cards from data"
 ```

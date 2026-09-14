@@ -1,103 +1,82 @@
-# 第5章　コンポーネントへ分ける
+# 第5章　作品情報をデータへ分離する
 
 ## 目的
 
-長い`page.js`を、役割ごとのファイルへ分けます。
+作品の内容と、画面の形を分けます。
 
-## 1. 分ける基準
+## 1. データの形を決める
 
-次のいずれかに当てはまるものを、コンポーネントの候補にします。
-
-- 名前を付けられる
-- 同じ形を繰り返す
-- 別のページでも使う可能性がある
-- 独立した動きを持つ
-- ファイルを分けると親の役割が読みやすくなる
-
-細かく分けること自体が目的ではありません。
-
-## 2. HeaderとFooter
-
-```jsx
-// src/components/layout/Header.jsx
-import Image from "next/image";
-
-const navigationItems = [
-  { href: "#featured", label: "Featured" },
-  { href: "#dramas", label: "Dramas" },
-  { href: "#about", label: "About" },
+```js
+// src/data/dramas.js
+export const dramas = [
+  {
+    id: "true-detective",
+    title: "True Detective",
+    image: "/pict/truedetective.avif",
+    score: 10,
+    seasons: 4,
+    genre: ["Crime", "Mystery"],
+    year: 2014,
+    platform: "HBO",
+    featured: true,
+    large: false,
+    quote: "“The World needs bad men.”",
+    quoteBy: "Rust Cohle",
+    youtubeId: "jdu3hAAmFtk",
+    reviewTitle: "マスターピース",
+    review: [
+      "1シーズン完結型。シーズンごとに内容が大きく異なる。",
+      "どのシーズンも素晴らしいのだが、やはりシーズン1が別格。",
+    ],
+  },
+  {
+    id: "stranger-things",
+    title: "Stranger Things",
+    image: "/pict/strangerthings.avif",
+    score: 9,
+    seasons: 5,
+    genre: ["SF", "Juvenile"],
+    year: 2016,
+    platform: "NETFLIX",
+    featured: false,
+    large: false,
+    youtubeId: "6HkQ5ys3vEY",
+    reviewTitle: "三つ星レストランのジャンル全盛り丼",
+    review: ["NETFLIXの看板ドラマの1つ。加入したらまず観てほしい名作。"],
+  },
 ];
-
-export default function Header() {
-  return (
-    <header className="header">
-      <div className="header__inner inner">
-        <a href="#featured" className="header__logo" aria-label="Drama Archive トップへ">
-          <Image src="/pict/logo.svg" alt="Drama Archive" width={180} height={35} />
-        </a>
-
-        <nav className="header__nav" aria-label="メインナビゲーション">
-          <ul>
-            {navigationItems.map((item) => (
-              <li key={item.href}>
-                <a href={item.href}>{item.label}</a>
-              </li>
-            ))}
-
-          </ul>
-        </nav>
-      </div>
-    </header>
-  );
-}
 ```
 
-PC用とスマートフォン用に同じリンクを二度書かず、一つの配列から生成します。
+実際には、元HTMLにある全作品とレビュー全文を移します。文章を一つの長い文字列へ入れるより、段落の配列にすると表示方法を変更しやすくなります。
 
-```jsx
-// src/components/layout/Footer.jsx
-export default function Footer() {
-  return (
-    <footer className="footer">
-      <p>© Yasuyuki Ishizaki</p>
-    </footer>
-  );
-}
+## 2. IDの役割
+
+`id`はReactが一覧を識別するとき、モーダルで選択作品を識別するとき、将来URLを作るときに使えます。
+
+タイトルをそのままIDにせず、半角英数の安定した値にします。
+
+## 3. データに入れないもの
+
+次のような見た目の指定は、基本的にデータへ入れません。
+
+```js
+color: "yellow"
+fontSize: "24px"
+marginTop: "20px"
 ```
 
-## 3. pageを目次のようにする
-
-```jsx
-// src/app/page.js
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import DramaArchive from "@/components/drama/DramaArchive";
-
-export default function Home() {
-  return (
-    <>
-      <Header />
-      <main className="inner">
-        <DramaArchive />
-      </main>
-      <Footer />
-    </>
-  );
-}
-```
-
-親ファイルを読むと、ページの構成が短時間で分かる状態を目指します。
+データは内容、SCSSは見た目を担当します。ただし、`featured`や`large`のような表示上の意味を示す値はデータとして持てます。
 
 ## 今日の確認
 
-- [ ] コンポーネントを分ける理由を説明できる
-- [ ] importとexportの対応を確認できる
-- [ ] `page.js`がページ構成を示す形になった
-- [ ] 分割前と同じ見た目を保った
+- [ ] 全作品に重複しないIDがある
+- [ ] 作品情報と見た目の指定を分けた
+- [ ] レビュー全文が失われていない
+- [ ] データだけを見て内容を更新できる
 
 ## Git
 
 ```bash
 git add .
-git commit -m "Split page into reusable components"
+git commit -m "Move drama content into structured data"
 ```
