@@ -294,7 +294,7 @@ git config --global --list
 
 ```
 ユーザー名：ishizaki-dev
-公開するサイトのURL：https://ishizaki-dev.github.io/portfolio/
+公開するサイトのURL：https://ishizaki-dev.github.io/drama_archive/
 ```
 
 とすることが可能。
@@ -728,7 +728,7 @@ npm -v
 
 #### **ローカルでの作業**
 
-* ファインダーで、任意の場所に『portfolio』フォルダを設置。
+* ファインダーで、任意の場所に『drama_archive』フォルダを設置。
 * VSCodeで『フォルダで開く...』で展開。
 * 左サイドメニューを右クリック『新しいファイル』で『.gitignore』というファイルを作る。
 * 左サイドメニューを右クリック『新しいファイル』で『README.md』というファイルを作る。
@@ -752,7 +752,7 @@ tmp/
 
 ## ↓ この部分をコピペ
 
-# Portfolio Project
+# drama_archive Project
 
 このプロジェクトでは、プロフィールサイトを制作します。
 
@@ -793,7 +793,7 @@ git commit -m "first commit"
 
 ```
 git branch -M main
-git remote add origin git@github.com:アカウント名/portfolio.git
+git remote add origin git@github.com:アカウント名/drama_archive.git
 git push -u origin main
 ```
 

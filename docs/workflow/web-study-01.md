@@ -72,7 +72,7 @@ Gitへ記録する
 - Git
 - GitHub
 - SSH接続
-- `portfolio`リポジトリ
+- `drama_archive`リポジトリ
 - Next.jsプロジェクト
 - ESLint、Prettier、Stylelintなどの制作補助
 
@@ -110,7 +110,8 @@ Drama Archiveには、すでに次の能力が表れています。
 # 完成時の構成（案）
 
 ```text
-portfolio/
+
+/
 ├── public/
 │   └── pict/
 │       ├── logo.svg

@@ -1,0 +1,9 @@
+.container {
+  width: 90%;
+  max-width: 1080px;
+  margin-inline: auto;
+  display: grid;
+  place-content: center;
+  height: 100vh;
+  background-color: #5e71ea;
+}/*# sourceMappingURL=style.css.map */
