@@ -153,8 +153,8 @@ body {
 export const metadata = {
   title: {
     default: "Drama Archive",
-    template: "%s | powered by Next.js"
-  }
+    template: "%s | powered by Next.js",
+  },
   description: "海外ドラマのレビューをまとめた個人アーカイブ",
   keywords: [
     "海外ドラマ",

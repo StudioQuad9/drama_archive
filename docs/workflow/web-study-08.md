@@ -7,7 +7,7 @@
 ## 1. 選択中の作品をstateにする
 
 ```jsx
-// src/components/drama/DramaArchive.jsx
+// src/components/DramaArchive.jsx
 "use client";
 
 import { useState } from "react";

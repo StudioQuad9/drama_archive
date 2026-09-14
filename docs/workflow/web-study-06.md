@@ -1,4 +1,3 @@
-
 # 第6章　mapとpropsでカードを生成する
 
 ## 目的
@@ -8,7 +7,7 @@
 ## 1. DramaCard
 
 ```jsx
-// src/components/drama/DramaCard.jsx
+// src/components/DramaCard.jsx
 
 export default function DramaCard({ drama, number, onSelect }) {
   const genres = drama.genre.join(" · ");
@@ -49,7 +48,7 @@ export default function DramaCard({ drama, number, onSelect }) {
 ## 2. 一覧を生成する
 
 ```jsx
-// src/components/drama/DramaList.jsx
+// src/components/DramaList.jsx
 import DramaCard from "./DramaCard";
 
 export default function DramaList({ dramas, onSelect }) {
