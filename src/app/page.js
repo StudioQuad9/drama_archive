@@ -1,297 +1,433 @@
+import Image from "next/image";
+
 export default function Home() {
   return (
-      <main className="inner">
-        <section id="featured">
-          <h2>Featured</h2>
+    <main className="inner">
+      <section id="featured">
+        <h2>Featured</h2>
 
-          <div className="open-modal" data-modal="modal-true-detective">
-            <img src="pict/truedetective.avif" alt="True Detective" />
-            <p className="quote">
-              “The World needs bad men.”<br />
-              —Rust Cohle
-            </p>
-            <h3>True Detective</h3>
-            <p className="score">10/10</p>
-          </div>
-          <p className="information">
-            4 sesons / Crime ∙ Mystery<br />
-            2014 / HBO
+        <div className="open-modal" data-modal="modal-true-detective">
+          <Image
+            src="/pict/truedetective.avif"
+            alt="True Detective"
+            width={1920}
+            height={1534}
+          />
+          <p className="quote">
+            “The World needs bad men.”
+            <br />
+            —Rust Cohle
           </p>
-        </section>
+          <h3>True Detective</h3>
+          <p className="score">10/10</p>
+        </div>
+        <p className="information">
+          4 sesons / Crime ∙ Mystery
+          <br />
+          2014 / HBO
+        </p>
+      </section>
 
-        <section id="modal-true-detective" className="modal">
-          <div className="modal-content">
-            <h4>True Detective</h4>
-            <div className="youtube">
-              <iframe src="https://www.youtube.com/embed/jdu3hAAmFtk?si=wXd8WIX98FLWJIYQ" title="True Detective"
-                allowFullScreen>
-              </iframe>
-            </div>
-            <h5>マスターピース</h5>
-            <p className="review">
-              1シーズン完結型。シーズンごとに内容が大きく異なる。<br />
-              シーズン1はルイジアナ州で起きた儀式殺人を2人の刑事が追うサイコ・サスペンス。シーズン2はロサンゼルス近郊の街で役人が殺された事件をきっかけに腐敗した権力機構に飲み込まれる者たちのノワール群像劇。シーズン3は、2人の子どもの失踪事件を3つの時間軸で描く。シーズン4は未鑑賞。<br />
-              どのシーズンも素晴らしいのだが、やはりシーズン1が別格。これを観るためだけにHBOに加入してもいいレベル。<br />
-              マシュー・マコノヒーがニヒリスティックでとても癖の強いラスト・コール刑事を凄まじい演技力で「完璧に」演じ切っている。対する相棒のマーティン・ハートも、ラスト刑事に比べると平凡な刑事という役柄だが、彼の正義感や欲望・失敗をウディ・ハレルソンが巧みに演じ、非常に奥行きのあるキャラクターを表現している。<br />
-              もちろん物語の核となる脚本も1話からエンジンが全開で、終演まで一切だれることなく進んでいく。<br />
-              シーズン2はシーズン1とはジャンルも全く違うので、1にハマった人に安易に勧められないのだが、主人公の一人レイ・ヴェルコロ刑事演じるコリン・ファレルが本当に素晴らしいので、できたら観てほしい。レイという人物の今までの人生を感じさせるほどの演技は胸に迫るものがある。<br />
-              これは個人的なジンクスなのだが、オープニングがかっこいいドラマは外さないの好例。スタジオは数々の賞を取っている<a href="https://antibody.tv/" target="_blank" rel="noopener noreferrer">Antibody</a>。って言っときながら、サイトを確認したら1話で切ったラヴクラフト・カントリーとアメリカン・ゴッドのオープニングもあったので、ジンクスの信頼度は低いかもしれない。でもかっこいい。
-            </p>
+      <section id="modal-true-detective" className="modal">
+        <div className="modal-content">
+          <h4>True Detective</h4>
+          <div className="youtube">
+            <iframe
+              src="https://www.youtube.com/embed/jdu3hAAmFtk?si=wXd8WIX98FLWJIYQ"
+              title="True Detective"
+              allowFullScreen
+              >
+            </iframe>
           </div>
-        </section>
-
-
-        <section id="dramas">
-          <h2>Dramas</h2>
-
-          <div className="drama-cards">
-
-            <article className="drama open-modal" data-modal="modal-stranger-things">
-              <div className="flex">
-                <div className="thumbnail">
-                  <img src="pict/strangerthings.avif" alt="Stranger Things" />
-                </div>
-                <h4>Stranger Things</h4>
-                <p className="score">9/10</p>
-              </div>
-              <p className="information">
-                5 seasons / SF ∙ Juvenile<br />
-                2016 / NETFLIX
-              </p>
-            </article>
-
-            <section id="modal-stranger-things" className="modal">
-              <div className="modal-content">
-                <h4>Stranger Things</h4>
-                <div className="youtube">
-                  <iframe src="https://www.youtube.com/embed/6HkQ5ys3vEY?si=XSNVmm4G01BFtCy5" title="Stranger Things"
-                    allowFullScreen>
-                  </iframe>
-                </div>
-                <h5>三つ星レストランのジャンル全盛り丼</h5>
-                <p className="review">
-                  NETFLIXの看板ドラマの1つ。加入したらまず観てほしい名作。連続シリーズタイプ。<br />
-                  1980年代のインディアナ州の田舎町ホーキンスで起こる超常現象とそれに巻き込まれる子どもたち（とその家族）を描いた、「ET × グーニーズ × IT × Xファイル ×
-                  etc...」とでもいうような、ホラーもSFもミステリーもオカルトも友情も恋愛も家族愛も……、とりあえずジャンル横断で全盛りするという怪作・名作。さらに各要素どれもが素晴らしいレベルで、かつ一つとして物語を構成するうえで欠くことのできないという離れ業をかましている。<br />
-                  監督たち自身がかなりのオタクで、劇中では様々なものからの引用が見受けられるが、鼻につく感じではなく、本人たちが大好きなんだろうなという印象を受ける。<br />
-                  「登場人物がみんな良くて〜」って言うのはあまり好きではないわたしでさえもそう言うしかないほどに人物が魅力的。必ず一人は「推し」が見つかるだろうこと請け合い。ちなみにわたしはマイクの姉のナンシー・ウィーラー。<br />
-                  キャスティングもよく、全員演技を感じさせないぐらいキャラクターとして立つことに成功している。失踪した子どもを探す母親を演じるウィノナ・ライダー、だらしないが過去を克服しようと奮闘する署長役のデヴィッド・ハーバー、スクールカースト上位の典型的な嫌なヤツのジョー・キーリー、一言では言い表せないほど魅力的なキャラクターを演じたマヤ・ホーク（イーサン・ホークとユマ・サーマンの娘。めっちゃよかった！）、そしてエディ・マンソン役のジョセフ・クイン……等々、もうずっとオタク語りになってしまうほどのキャラクターたちが出てくる。<br />
-                  ただなぜスコアが9/10なのかは、ラストシーズンが少し、まぁちょっとアレだったかな……っていうのがあり……。でもあのようなかたち以外でどう畳められるかと言われると難しいしな〜という。終わり方って難しいですね。
-                </p>
-              </div>
-            </section>
-
-            <article className="drama open-modal" data-modal="modal-mindhunter">
-              <div className="flex">
-                <div className="thumbnail">
-                  <img src="pict/mindhunter.avif" alt="Mindhunter" />
-                </div>
-                <h4>Mindhunter</h4>
-                <p className="score">9/10</p>
-              </div>
-              <p className="information">
-                2 seasons / Crime ∙ Psycho<br />
-                2017 / NETFLIX
-              </p>
-            </article>
-
-            <section id="modal-mindhunter" className="modal">
-              <div className="modal-content">
-                <h4>Mindhunter</h4>
-                <div className="youtube">
-                  <iframe src="https://www.youtube.com/embed/UTxD4NOIkXk?si=0rOFsrL8I4LVHYNZ" title="Mindhunter"
-                    allowFullScreen>
-                  </iframe>
-                </div>
-                <h5>不条理</h5>
-                <p className="review">
-                  「製作総指揮／監督がデヴィッド・フィンチャー」もうこれだけ観る人は観るでしょう。自身の監督作品『セブン』『ファイト・クラブ』『ゾディアック』のような全編トーンが抑えられた画造りになっている。グレイッシュな画面で、その中をスーツ姿の男が苦々しい顔して奔走しているというだけで個人的にはもう6点は堅い。完全に好みだが。<br />
-                  物語は日本でも一時流行った「プロファイリング」誕生前夜の話。FBIの2人のエージェントと大学教授がシリアルキラーたちにインタビューして、新たな捜査手法を立ち上げていくというもの。なので特にシーズン1はどんどん謎が解けていって……という感じではなく、ひたすらにサイコパスの独白を聞き、内面を覗き込むようなあまり精神衛生上よろしくない暗い物語（シーズン2は進行中の事件も追うが）。<br />
-                  キャストに関しては、エージェントの一人ビル・テンチ演じるホルト・マッキャラニーが、シリアルキラーと相対しながらも難しい家庭での父親という両面を素晴らしい演技で演じきっている。彼の常に疲れていて、家でネクタイを外してもリラックスできていない表情などがほんとうにうまい。<br />
-                  ……という最高のドラマの一つではあるのだが、一点だけ無視できない欠点がある。それはこのドラマはシーズン2で打ち切られているということ。評価も非常に高かったのだが、制作費や監督のスケジュールなどが原因らしく、監督自身が打ち切りを公言しているので、撤回は望むべくもない……。<br />
-                  そのせいで1点減点しているが、むしろ1点減に収まるほど非の打ち所がない素晴らしいドラマなので、「もうほんとうになんでなん……？　なんでこんな仕打ちすんの……？」しか言えない……。なんで……<br />
-
-                </p>
-              </div>
-            </section>
-
-            <article className="drama open-modal" data-modal="modal-mandalorian">
-              <div className="flex">
-                <div className="thumbnail">
-                  <img src="pict/mandalorian.avif" alt="Mandalorian" />
-                </div>
-                <h4>Mandalorian</h4>
-                <p className="score">8/10</p>
-              </div>
-              <p className="information">
-                4 seasons / Star Wars ∙ Adventure<br />
-                2016 / Disney+
-              </p>
-            </article>
-
-            <section id="modal-mandalorian" className="modal">
-              <div className="modal-content">
-                <h4>Mandalorian</h4>
-                <div className="youtube">
-                  <iframe src="https://www.youtube.com/embed/wqIqE_vACtM?si=X5mQ-zJ-cgdtQ5bV" title="Mandalorian"
-                    allowFullScreen>
-                  </iframe>
-                </div>
-                <h5>こういうのでいいんだよ</h5>
-                <p className="review">
-                  「これ。これ。こういうのでいいんだよ」1話を観たとき、まさにこのミームを口にしてしまった。<br />
-                  2026年には映画も公開されヒットした、同作のドラマ（映画は未鑑賞）。傭兵や賞金稼ぎとして生きているマンダロリアン（という部族）が出自不明なヨーダによく似ているグローグとともに銀河を旅する、乱暴に言ってしまえば「ギャラクシー子連れ狼」。Disney+がローンチタイトルとして並々ならぬ力を入れて2019年に配信を始めた。<br />
-                  スター・ウォーズユニバースの話だが、本編のフォースや共和国対帝国といったところから離れた物語であり、スター・ウォーズに（カルチャーとしての知識以上の）関心がないわたしでもかなり楽しめる作品になっていた。<br />
-                  『用心棒』や『七人の侍』といった時代劇を彷彿とする要素も大きく、本編以上にインスパイアが強い印象を受けた。「ルーカスもこういうの撮りたかったのかなー」などと観ながら思った。<br />
-                  非常に完成度も高く、前述の通りスター・ウォーズファンでなくとも楽しめる作品であることは間違いないのだが、個人的にはシーズンを重ねるごとに少しずつ正史の「大きな物語」への接続が増えてきたのが少し残念だった。また他のスター・ウォーズドラマ『ボバ・フェット』『アソーカ』等のエピソードを観ていないと、つながりが不明瞭な箇所もある（逆も然り）。ルーカスフィルムとしては他作品とも合わせて、スター・ウォーズユニバースをリブートさせようという意図があるのかもしれない。個人的にはそういったものから無縁の辺境の惑星をマンダロリアンと飛び回りながら、グローグは虫を食べててほしかった。ただスター・ウォーズファンからしたら逆なのかもしれない。<br />
-                  しかしそれを差し引いてもなお人には強く勧めたい作品ではある。
-                </p>
-              </div>
-            </section>
-
-            <article className="drama open-modal drama__large" data-modal="modal-bosch">
-              <div className="flex">
-                <div className="thumbnail">
-                  <img src="pict/bosch.avif" alt="Bosch" />
-                </div>
-                <h4>Bosch</h4>
-                <p className="score">10/10</p>
-              </div>
-              <p className="information">
-                8 seasons / Crime ∙ Hardboiled<br />
-                2010 / Amazon Prime
-              </p>
-            </article>
-
-            <section id="modal-bosch" className="modal">
-              <div className="modal-content">
-                <h4>Bosch</h4>
-                <div className="youtube">
-                  <iframe src="https://www.youtube.com/embed/9qnUMKfxRho?si=yc_1pf5urDmYxoZs" title="Bosch" allowFullScreen>
-                  </iframe>
-                </div>
-                <h5>一人の人間として立っている</h5>
-                <p className="review">
-                  このドラマに登場する人物全員が一人の人間として感じられる。善悪、魅力的／嫌悪、共感できる／できない、そういった次元とは別に「この人は、この世界にこの人間として存在している」と感じさせること、そこに個人的には大きく惹かれてしまう。『ボッシュ』はそれを高レベルで全編にわたり感じさせてくれるドラマ。<br />
-                  ロサンゼルスのハリウッド署を舞台に刑事ハリー・ボッシュが様々な事件を解決していく。事件そのものは1シーズン完結型。基本的には2〜3の複数の事件が同時に起こり、主人公たちがかなりヘビーな状況に追い込まれていく。<br />
-                  シーズンによっては事件（物語）がスロースターターな印象のものもあるが、先述の通り人物描写が非常に優れているため全くだれない。<br />
-                  別れた妻も、愛する一人娘も、全く信条の違う上司も、反目する検察官も、弁護士も、相対する犯罪者も、麻薬中毒者も、ホームレスの少年でさえも「カメラが回っていない過去を歩んできて今そこに在る」という現実味を感じさせる。<br />
-                  あまり有名ではないかもしれないが傑作。<br />
-                  シーズン5のラストで流れるアコースティックバージョンのDeftones『Be Quiet And Drive (Far Away)』は本当にぴったりの選曲だった。
-                </p>
-              </div>
-            </section>
-
-            <article className="drama open-modal" data-modal="modal-westworld">
-              <div className="flex">
-                <div className="thumbnail">
-                  <img src="pict/westworld.avif" alt="Westworld" />
-                </div>
-                <h4>Westworld</h4>
-                <p className="score">7/10</p>
-              </div>
-              <p className="information">
-                4 seasons / SF ∙ Android<br />
-                2016 / HBO
-              </p>
-            </article>
-
-            <section id="modal-westworld" className="modal">
-              <div className="modal-content">
-                <h4>Westworld</h4>
-                <div className="youtube">
-                  <iframe src="https://www.youtube.com/embed/IeB2idbImEY?si=_X7S2E4j15ry5znk" title="Westworld"
-                    allowFullScreen>
-                  </iframe>
-                </div>
-                <h5>傑作ではある……</h5>
-                <p className="review">
-                  近未来、ゲストたちのあらゆる欲望を叶える「西部時代」をテーマにしたテーマパーク「ウエストワールド」でキャスト（アンドロイド）たちに何かが起き始めて……、というストーリー。連続シリーズタイプ。<br />
-                  脚本、俳優、セット・CG、すべてが完璧としか言えないほどのクオリティ。今まで観てきたドラマの中でも間違いなくトップクラス。<br />
-                  制作には映画監督のJ・J・エイブラムスとジョナサン・ローラン（あの映画監督クリストファー・ノーランの弟）とその妻リサ・ジョイが関わっている。また俳優もアンソニー・ホプキンス、エド・ハリス、ジェフリー・ライト、テッサ・トンプソン、（シーズン2では）菊地凛子、真田広之など、非常に豪華でHBO（ワーナー）の本気度合いが伝わってくる。<br />
-                  どの俳優の演技も素晴らしいのだが、メインのドロレス役のエヴァン・レイチェル・ウッドの演技がずば抜けており、観ていて鳥肌が立つレベル。ストーリーは時間軸をあえてバラバラにした複雑な構成になっており、そのうえで表情・声・仕草を少しずつ変えることで同じ人物なのに何かが変わっているという印象をストーリーにもたらし、さらなる深みを加えている。彼女の恐ろしいほどの美貌とその変容に観る者は強く引き込こまれる。<br />
-                  また劇中の音楽は数々の映画音楽を手掛けているラミン・ジャヴァディが担当している。有名な曲のオーケストラバージョンがわかりやすく作中の一番盛り上がるシーンで流れるのが気持ちも入りやすく非常によかった。シーズン1ではRolling
-                  Stonesの『Paint It Black』、シーズン2はNirvanaの『Heart-Shaped Box』、シーズン3は『Sweet Child O’ Mine』。<br />
-                  こんな高評価なのに、スコアがなぜ7/10なのか？　それは上記の音楽以外の感想が全て「シーズン1に限る」から。シーズン2以降、1であったような首を掴まれて引っ張られるようなドライブ感も、それぞれのキャラクターの強さも急激に薄れてしまう。制作陣が総替えにでもなったのか……大好きなドラマだっただけにひたすらに残念。シーズン3までは観たが、シーズン4で打ち切り。<br />
-                  このドラマのオープニングもTrue Detective同様、<a href="https://antibody.tv/" target="_blank" rel="noopener noreferrer">Antibody</a>。今見てもワクワクするクオリティ。
-                </p>
-              </div>
-            </section>
-
-            <article className="drama open-modal" data-modal="modal-loki">
-              <div className="flex">
-                <div className="thumbnail">
-                  <img src="pict/loki.avif" alt="Loki" />
-                </div>
-                <h4>Loki</h4>
-                <p className="score">7/10</p>
-              </div>
-              <p className="information">
-                2 seasons / SF ∙ Marvel<br />
-                2021 / Disney+
-              </p>
-            </article>
-
-            <section id="modal-loki" className="modal">
-              <div className="modal-content">
-                <h4>Loki</h4>
-                <div className="youtube">
-                  <iframe src="https://www.youtube.com/embed/K1mU5FU-B3E?si=ywp-V_8c9NvzUtkj" title="Loki" allowFullScreen>
-                  </iframe>
-                </div>
-                <h5>マーベルファンじゃなくても是非</h5>
-                <p className="review">
-                  マーベルの映画に出てくる悪役「ロキ」を主人公にした連続シリーズドラマ。次元（マルチバース）をまたぎ好き放題していたロキが時間変異取締局という組織に捕らえられ、そこでマルチバースの際限なき発生が世界を危機にさらしていると知らされ……という話。<br />
-                  マーベルに一般教養以上の興味・事前情報を持たない（スター・ウォーズ同様）わたしでも非常に楽しめた。<br />
-                  トム・ヒドルストンは『キングコング』ぐらいしか観たことがなかったのだが、実際に観るとかなり好きになってしまった。個人的に二枚目俳優が、饒舌でプライドが高いながらもどこか抜けているところがあるというキャラクターを演じているのが好みなのかもしれない。<br />
-                  彼のテンポの良い少しコミカルな感じと、作品全体のレトロフューチャー感がとても良くマッチしていて、止め時がない素晴らしいドラマに仕上がっている。（良い意味で）軽い気持ちで観ることができるので（他のおすすめが重すぎる）、マーベルファン／トムヒファンでなくともおすすめできるドラマ。
-                </p>
-              </div>
-            </section>
-
-            <article className="drama open-modal" data-modal="modal-tokyo-vice">
-              <div className="flex">
-                <div className="thumbnail">
-                  <img src="pict/tokyovice.avif" alt="Tokyo Vice" />
-                </div>
-                <h4>Tokyo Vice</h4>
-                <p className="score">8/10</p>
-              </div>
-              <p className="information">
-                2 seasons / Crime ∙ Yakuza<br />
-                2022 / HBO ∙ WOWOW
-              </p>
-            </article>
-
-            <section id="modal-tokyo-vice" className="modal">
-              <div className="modal-content">
-                <h4>Tokyo Vice</h4>
-                <div className="youtube">
-                  <iframe src="https://www.youtube.com/embed/F9omNYH0g5w?si=u4jMGGQrUZwKlVnH" title="Tokyo Vice"
-                    allowFullScreen>
-                  </iframe>
-                </div>
-                <h5></h5>
-                <p className="review">
-                  HBOとWOWOWの共同制作。闇金が社会問題化し出した90年代末期の東京を舞台に、暴力団対策課の刑事とともにヤクザを取材するアメリカ人記者の物語。<br />
-                  主人公の記者は映画『ベイビー・ドライバー』でも主演を務めたアンセル・エルゴート、暴力団対策課の刑事を渡辺謙、ヤクザの組員を笠松将、生活安全課の刑事を伊藤英明、主人公の先輩社員を菊地凛子、クズのホストを山下智久、クズのクラブオーナーを萩原聖人等々、脇役も含めて日本人俳優も非常に豪華。<br />
-                  個人的には、笠松将と伊藤英明が非常によかった。笠松将は幼さを感じるぐらい屈託ない笑顔と行き場を失った感情が爆発しそうな緊張感の両面を常に漂わせていて、ヤクザの若いリーダー役として申し分ない演技だった。自分が10代の女性だったら間違いなく部屋を彼のポスターで埋めていただろうと思う。まじで惚れた。<br />
-                  伊藤英明の方は、今まで真面目で正義感の強いイメージがあったのだが、不真面目でグレー寄りの刑事の役が見事にはまっていた。あの整った顔で身勝手かつだらしない役というのは個人的にはかなりアリだと思う。<br />
-                  ちなみに渡辺謙はいつもの渡辺謙。
-                </p>
-              </div>
-            </section>
-
-          </div>
-        </section>
-
-        <div id="about">
-          <h2>About</h2>
-          <p>
-            このサイトはいしざきが今まで観た海外ドラマの（独断と偏見に満ちた）レビューをまとめたものです。
+          <h5>マスターピース</h5>
+          <p className="review">
+            1シーズン完結型。シーズンごとに内容が大きく異なる。
+            <br />
+            シーズン1はルイジアナ州で起きた儀式殺人を2人の刑事が追うサイコ・サスペンス。シーズン2はロサンゼルス近郊の街で役人が殺された事件をきっかけに腐敗した権力機構に飲み込まれる者たちのノワール群像劇。シーズン3は、2人の子どもの失踪事件を3つの時間軸で描く。シーズン4は未鑑賞。
+            <br />
+            どのシーズンも素晴らしいのだが、やはりシーズン1が別格。これを観るためだけにHBOに加入してもいいレベル。
+            <br />
+            マシュー・マコノヒーがニヒリスティックでとても癖の強いラスト・コール刑事を凄まじい演技力で「完璧に」演じ切っている。対する相棒のマーティン・ハートも、ラスト刑事に比べると平凡な刑事という役柄だが、彼の正義感や欲望・失敗をウディ・ハレルソンが巧みに演じ、非常に奥行きのあるキャラクターを表現している。
+            <br />
+            もちろん物語の核となる脚本も1話からエンジンが全開で、終演まで一切だれることなく進んでいく。
+            <br />
+            シーズン2はシーズン1とはジャンルも全く違うので、1にハマった人に安易に勧められないのだが、主人公の一人レイ・ヴェルコロ刑事演じるコリン・ファレルが本当に素晴らしいので、できたら観てほしい。レイという人物の今までの人生を感じさせるほどの演技は胸に迫るものがある。
+            <br />
+            これは個人的なジンクスなのだが、オープニングがかっこいいドラマは外さないの好例。スタジオは数々の賞を取っている
+            <a
+              href="https://antibody.tv/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Antibody
+            </a>
+            。って言っときながら、サイトを確認したら1話で切ったラヴクラフト・カントリーとアメリカン・ゴッドのオープニングもあったので、ジンクスの信頼度は低いかもしれない。でもかっこいい。
           </p>
         </div>
+      </section>
 
-      </main>
+      <section id="dramas">
+        <h2>Dramas</h2>
+
+        <div className="drama-cards">
+          <article
+            className="drama open-modal"
+            data-modal="modal-stranger-things"
+          >
+            <div className="flex">
+              <div className="thumbnail">
+                <Image
+                  src="/pict/strangerthings.avif"
+                  alt="Stranger Things"
+                  width={1920}
+                  height={1076}
+                />
+              </div>
+              <h4>Stranger Things</h4>
+              <p className="score">9/10</p>
+            </div>
+            <p className="information">
+              5 seasons / SF ∙ Juvenile
+              <br />
+              2016 / NETFLIX
+            </p>
+          </article>
+
+          <section id="modal-stranger-things" className="modal">
+            <div className="modal-content">
+              <h4>Stranger Things</h4>
+              <div className="youtube">
+                <iframe
+                  src="https://www.youtube.com/embed/6HkQ5ys3vEY?si=XSNVmm4G01BFtCy5"
+                  title="Stranger Things"
+                  allowFullScreen
+                >
+                </iframe>
+              </div>
+              <h5>三つ星レストランのジャンル全盛り丼</h5>
+              <p className="review">
+                NETFLIXの看板ドラマの1つ。加入したらまず観てほしい名作。連続シリーズタイプ。
+                <br />
+                1980年代のインディアナ州の田舎町ホーキンスで起こる超常現象とそれに巻き込まれる子どもたち（とその家族）を描いた、「ET
+                × グーニーズ × IT × Xファイル ×
+                etc...」とでもいうような、ホラーもSFもミステリーもオカルトも友情も恋愛も家族愛も……、とりあえずジャンル横断で全盛りするという怪作・名作。さらに各要素どれもが素晴らしいレベルで、かつ一つとして物語を構成するうえで欠くことのできないという離れ業をかましている。
+                <br />
+                監督たち自身がかなりのオタクで、劇中では様々なものからの引用が見受けられるが、鼻につく感じではなく、本人たちが大好きなんだろうなという印象を受ける。
+                <br />
+                「登場人物がみんな良くて〜」って言うのはあまり好きではないわたしでさえもそう言うしかないほどに人物が魅力的。必ず一人は「推し」が見つかるだろうこと請け合い。ちなみにわたしはマイクの姉のナンシー・ウィーラー。
+                <br />
+                キャスティングもよく、全員演技を感じさせないぐらいキャラクターとして立つことに成功している。失踪した子どもを探す母親を演じるウィノナ・ライダー、だらしないが過去を克服しようと奮闘する署長役のデヴィッド・ハーバー、スクールカースト上位の典型的な嫌なヤツのジョー・キーリー、一言では言い表せないほど魅力的なキャラクターを演じたマヤ・ホーク（イーサン・ホークとユマ・サーマンの娘。めっちゃよかった！）、そしてエディ・マンソン役のジョセフ・クイン……等々、もうずっとオタク語りになってしまうほどのキャラクターたちが出てくる。
+                <br />
+                ただなぜスコアが9/10なのかは、ラストシーズンが少し、まぁちょっとアレだったかな……っていうのがあり……。でもあのようなかたち以外でどう畳められるかと言われると難しいしな〜という。終わり方って難しいですね。
+              </p>
+            </div>
+          </section>
+
+          <article className="drama open-modal" data-modal="modal-mindhunter">
+            <div className="flex">
+              <div className="thumbnail">
+                <Image
+                  src="/pict/mindhunter.avif"
+                  alt="Mindhunter"
+                  width={1920}
+                  height={1280}
+                />
+              </div>
+              <h4>Mindhunter</h4>
+              <p className="score">9/10</p>
+            </div>
+            <p className="information">
+              2 seasons / Crime ∙ Psycho
+              <br />
+              2017 / NETFLIX
+            </p>
+          </article>
+
+          <section id="modal-mindhunter" className="modal">
+            <div className="modal-content">
+              <h4>Mindhunter</h4>
+              <div className="youtube">
+                <iframe
+                  src="https://www.youtube.com/embed/UTxD4NOIkXk?si=0rOFsrL8I4LVHYNZ"
+                  title="Mindhunter"
+                  allowFullScreen
+                >
+                </iframe>
+              </div>
+              <h5>不条理</h5>
+              <p className="review">
+                「製作総指揮／監督がデヴィッド・フィンチャー」もうこれだけ観る人は観るでしょう。自身の監督作品『セブン』『ファイト・クラブ』『ゾディアック』のような全編トーンが抑えられた画造りになっている。グレイッシュな画面で、その中をスーツ姿の男が苦々しい顔して奔走しているというだけで個人的にはもう6点は堅い。完全に好みだが。
+                <br />
+                物語は日本でも一時流行った「プロファイリング」誕生前夜の話。FBIの2人のエージェントと大学教授がシリアルキラーたちにインタビューして、新たな捜査手法を立ち上げていくというもの。なので特にシーズン1はどんどん謎が解けていって……という感じではなく、ひたすらにサイコパスの独白を聞き、内面を覗き込むようなあまり精神衛生上よろしくない暗い物語（シーズン2は進行中の事件も追うが）。
+                <br />
+                キャストに関しては、エージェントの一人ビル・テンチ演じるホルト・マッキャラニーが、シリアルキラーと相対しながらも難しい家庭での父親という両面を素晴らしい演技で演じきっている。彼の常に疲れていて、家でネクタイを外してもリラックスできていない表情などがほんとうにうまい。
+                <br />
+                ……という最高のドラマの一つではあるのだが、一点だけ無視できない欠点がある。それはこのドラマはシーズン2で打ち切られているということ。評価も非常に高かったのだが、制作費や監督のスケジュールなどが原因らしく、監督自身が打ち切りを公言しているので、撤回は望むべくもない……。
+                <br />
+                そのせいで1点減点しているが、むしろ1点減に収まるほど非の打ち所がない素晴らしいドラマなので、「もうほんとうになんでなん……？　なんでこんな仕打ちすんの……？」しか言えない……。なんで……
+                <br />
+              </p>
+            </div>
+          </section>
+
+          <article className="drama open-modal" data-modal="modal-mandalorian">
+            <div className="flex">
+              <div className="thumbnail">
+                <Image
+                  src="/pict/mandalorian.avif"
+                  alt="Mandalorian"
+                  width={1920}
+                  height={853}
+                />
+              </div>
+              <h4>Mandalorian</h4>
+              <p className="score">8/10</p>
+            </div>
+            <p className="information">
+              4 seasons / Star Wars ∙ Adventure
+              <br />
+              2016 / Disney+
+            </p>
+          </article>
+
+          <section id="modal-mandalorian" className="modal">
+            <div className="modal-content">
+              <h4>Mandalorian</h4>
+              <div className="youtube">
+                <iframe
+                  src="https://www.youtube.com/embed/wqIqE_vACtM?si=X5mQ-zJ-cgdtQ5bV"
+                  title="Mandalorian"
+                  allowFullScreen
+                >
+                </iframe>
+              </div>
+              <h5>こういうのでいいんだよ</h5>
+              <p className="review">
+                「これ。これ。こういうのでいいんだよ」1話を観たとき、まさにこのミームを口にしてしまった。
+                <br />
+                2026年には映画も公開されヒットした、同作のドラマ（映画は未鑑賞）。傭兵や賞金稼ぎとして生きているマンダロリアン（という部族）が出自不明なヨーダによく似ているグローグとともに銀河を旅する、乱暴に言ってしまえば「ギャラクシー子連れ狼」。Disney+がローンチタイトルとして並々ならぬ力を入れて2019年に配信を始めた。
+                <br />
+                スター・ウォーズユニバースの話だが、本編のフォースや共和国対帝国といったところから離れた物語であり、スター・ウォーズに（カルチャーとしての知識以上の）関心がないわたしでもかなり楽しめる作品になっていた。
+                <br />
+                『用心棒』や『七人の侍』といった時代劇を彷彿とする要素も大きく、本編以上にインスパイアが強い印象を受けた。「ルーカスもこういうの撮りたかったのかなー」などと観ながら思った。
+                <br />
+                非常に完成度も高く、前述の通りスター・ウォーズファンでなくとも楽しめる作品であることは間違いないのだが、個人的にはシーズンを重ねるごとに少しずつ正史の「大きな物語」への接続が増えてきたのが少し残念だった。また他のスター・ウォーズドラマ『ボバ・フェット』『アソーカ』等のエピソードを観ていないと、つながりが不明瞭な箇所もある（逆も然り）。ルーカスフィルムとしては他作品とも合わせて、スター・ウォーズユニバースをリブートさせようという意図があるのかもしれない。個人的にはそういったものから無縁の辺境の惑星をマンダロリアンと飛び回りながら、グローグは虫を食べててほしかった。ただスター・ウォーズファンからしたら逆なのかもしれない。
+                <br />
+                しかしそれを差し引いてもなお人には強く勧めたい作品ではある。
+              </p>
+            </div>
+          </section>
+
+          <article
+            className="drama open-modal drama__large"
+            data-modal="modal-bosch"
+          >
+            <div className="flex">
+              <div className="thumbnail">
+                <Image
+                  src="/pict/bosch.avif"
+                  alt="Bosch"
+                  width={1920}
+                  height={1076}
+                />
+              </div>
+              <h4>Bosch</h4>
+              <p className="score">10/10</p>
+            </div>
+            <p className="information">
+              8 seasons / Crime ∙ Hardboiled
+              <br />
+              2010 / Amazon Prime
+            </p>
+          </article>
+
+          <section id="modal-bosch" className="modal">
+            <div className="modal-content">
+              <h4>Bosch</h4>
+              <div className="youtube">
+                <iframe
+                  src="https://www.youtube.com/embed/9qnUMKfxRho?si=yc_1pf5urDmYxoZs"
+                  title="Bosch"
+                  allowFullScreen
+                >
+                </iframe>
+              </div>
+              <h5>一人の人間として立っている</h5>
+              <p className="review">
+                このドラマに登場する人物全員が一人の人間として感じられる。善悪、魅力的／嫌悪、共感できる／できない、そういった次元とは別に「この人は、この世界にこの人間として存在している」と感じさせること、そこに個人的には大きく惹かれてしまう。『ボッシュ』はそれを高レベルで全編にわたり感じさせてくれるドラマ。
+                <br />
+                ロサンゼルスのハリウッド署を舞台に刑事ハリー・ボッシュが様々な事件を解決していく。事件そのものは1シーズン完結型。基本的には2〜3の複数の事件が同時に起こり、主人公たちがかなりヘビーな状況に追い込まれていく。
+                <br />
+                シーズンによっては事件（物語）がスロースターターな印象のものもあるが、先述の通り人物描写が非常に優れているため全くだれない。
+                <br />
+                別れた妻も、愛する一人娘も、全く信条の違う上司も、反目する検察官も、弁護士も、相対する犯罪者も、麻薬中毒者も、ホームレスの少年でさえも「カメラが回っていない過去を歩んできて今そこに在る」という現実味を感じさせる。
+                <br />
+                あまり有名ではないかもしれないが傑作。
+                <br />
+                シーズン5のラストで流れるアコースティックバージョンのDeftones『Be
+                Quiet And Drive (Far Away)』は本当にぴったりの選曲だった。
+              </p>
+            </div>
+          </section>
+
+          <article className="drama open-modal" data-modal="modal-westworld">
+            <div className="flex">
+              <div className="thumbnail">
+                <Image
+                  src="/pict/westworld.avif"
+                  alt="Westworld"
+                  width={1920}
+                  height={1076}
+                />
+              </div>
+              <h4>Westworld</h4>
+              <p className="score">7/10</p>
+            </div>
+            <p className="information">
+              4 seasons / SF ∙ Android
+              <br />
+              2016 / HBO
+            </p>
+          </article>
+
+          <section id="modal-westworld" className="modal">
+            <div className="modal-content">
+              <h4>Westworld</h4>
+              <div className="youtube">
+                <iframe
+                  src="https://www.youtube.com/embed/IeB2idbImEY?si=_X7S2E4j15ry5znk"
+                  title="Westworld"
+                  allowFullScreen
+                >
+                </iframe>
+              </div>
+              <h5>傑作ではある……</h5>
+              <p className="review">
+                近未来、ゲストたちのあらゆる欲望を叶える「西部時代」をテーマにしたテーマパーク「ウエストワールド」でキャスト（アンドロイド）たちに何かが起き始めて……、というストーリー。連続シリーズタイプ。
+                <br />
+                脚本、俳優、セット・CG、すべてが完璧としか言えないほどのクオリティ。今まで観てきたドラマの中でも間違いなくトップクラス。
+                <br />
+                制作には映画監督のJ・J・エイブラムスとジョナサン・ローラン（あの映画監督クリストファー・ノーランの弟）とその妻リサ・ジョイが関わっている。また俳優もアンソニー・ホプキンス、エド・ハリス、ジェフリー・ライト、テッサ・トンプソン、（シーズン2では）菊地凛子、真田広之など、非常に豪華でHBO（ワーナー）の本気度合いが伝わってくる。
+                <br />
+                どの俳優の演技も素晴らしいのだが、メインのドロレス役のエヴァン・レイチェル・ウッドの演技がずば抜けており、観ていて鳥肌が立つレベル。ストーリーは時間軸をあえてバラバラにした複雑な構成になっており、そのうえで表情・声・仕草を少しずつ変えることで同じ人物なのに何かが変わっているという印象をストーリーにもたらし、さらなる深みを加えている。彼女の恐ろしいほどの美貌とその変容に観る者は強く引き込こまれる。
+                <br />
+                また劇中の音楽は数々の映画音楽を手掛けているラミン・ジャヴァディが担当している。有名な曲のオーケストラバージョンがわかりやすく作中の一番盛り上がるシーンで流れるのが気持ちも入りやすく非常によかった。シーズン1ではRolling
+                Stonesの『Paint It Black』、シーズン2はNirvanaの『Heart-Shaped
+                Box』、シーズン3は『Sweet Child O’ Mine』。
+                <br />
+                こんな高評価なのに、スコアがなぜ7/10なのか？　それは上記の音楽以外の感想が全て「シーズン1に限る」から。シーズン2以降、1であったような首を掴まれて引っ張られるようなドライブ感も、それぞれのキャラクターの強さも急激に薄れてしまう。制作陣が総替えにでもなったのか……大好きなドラマだっただけにひたすらに残念。シーズン3までは観たが、シーズン4で打ち切り。
+                <br />
+                このドラマのオープニングもTrue Detective同様、
+                <a
+                  href="https://antibody.tv/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Antibody
+                </a>
+                。今見てもワクワクするクオリティ。
+              </p>
+            </div>
+          </section>
+
+          <article className="drama open-modal" data-modal="modal-loki">
+            <div className="flex">
+              <div className="thumbnail">
+                <Image
+                  src="/pict/loki.avif"
+                  alt="Loki"
+                  width={1920}
+                  height={1280}
+                />
+              </div>
+              <h4>Loki</h4>
+              <p className="score">7/10</p>
+            </div>
+            <p className="information">
+              2 seasons / SF ∙ Marvel
+              <br />
+              2021 / Disney+
+            </p>
+          </article>
+
+          <section id="modal-loki" className="modal">
+            <div className="modal-content">
+              <h4>Loki</h4>
+              <div className="youtube">
+                <iframe
+                  src="https://www.youtube.com/embed/K1mU5FU-B3E?si=ywp-V_8c9NvzUtkj"
+                  title="Loki"
+                  allowFullScreen
+                >
+                </iframe>
+              </div>
+              <h5>マーベルファンじゃなくても是非</h5>
+              <p className="review">
+                マーベルの映画に出てくる悪役「ロキ」を主人公にした連続シリーズドラマ。次元（マルチバース）をまたぎ好き放題していたロキが時間変異取締局という組織に捕らえられ、そこでマルチバースの際限なき発生が世界を危機にさらしていると知らされ……という話。
+                <br />
+                マーベルに一般教養以上の興味・事前情報を持たない（スター・ウォーズ同様）わたしでも非常に楽しめた。
+                <br />
+                トム・ヒドルストンは『キングコング』ぐらいしか観たことがなかったのだが、実際に観るとかなり好きになってしまった。個人的に二枚目俳優が、饒舌でプライドが高いながらもどこか抜けているところがあるというキャラクターを演じているのが好みなのかもしれない。
+                <br />
+                彼のテンポの良い少しコミカルな感じと、作品全体のレトロフューチャー感がとても良くマッチしていて、止め時がない素晴らしいドラマに仕上がっている。（良い意味で）軽い気持ちで観ることができるので（他のおすすめが重すぎる）、マーベルファン／トムヒファンでなくともおすすめできるドラマ。
+              </p>
+            </div>
+          </section>
+
+          <article className="drama open-modal" data-modal="modal-tokyo-vice">
+            <div className="flex">
+              <div className="thumbnail">
+                <Image
+                  src="/pict/tokyovice.avif"
+                  alt="Tokyo Vice"
+                  width={1920}
+                  height={1920}
+                />
+              </div>
+              <h4>Tokyo Vice</h4>
+              <p className="score">8/10</p>
+            </div>
+            <p className="information">
+              2 seasons / Crime ∙ Yakuza
+              <br />
+              2022 / HBO ∙ WOWOW
+            </p>
+          </article>
+
+          <section id="modal-tokyo-vice" className="modal">
+            <div className="modal-content">
+              <h4>Tokyo Vice</h4>
+              <div className="youtube">
+                <iframe
+                  src="https://www.youtube.com/embed/F9omNYH0g5w?si=u4jMGGQrUZwKlVnH"
+                  title="Tokyo Vice"
+                  allowFullScreen
+                >
+                </iframe>
+              </div>
+              <h5></h5>
+              <p className="review">
+                HBOとWOWOWの共同制作。闇金が社会問題化し出した90年代末期の東京を舞台に、暴力団対策課の刑事とともにヤクザを取材するアメリカ人記者の物語。
+                <br />
+                主人公の記者は映画『ベイビー・ドライバー』でも主演を務めたアンセル・エルゴート、暴力団対策課の刑事を渡辺謙、ヤクザの組員を笠松将、生活安全課の刑事を伊藤英明、主人公の先輩社員を菊地凛子、クズのホストを山下智久、クズのクラブオーナーを萩原聖人等々、脇役も含めて日本人俳優も非常に豪華。
+                <br />
+                個人的には、笠松将と伊藤英明が非常によかった。笠松将は幼さを感じるぐらい屈託ない笑顔と行き場を失った感情が爆発しそうな緊張感の両面を常に漂わせていて、ヤクザの若いリーダー役として申し分ない演技だった。自分が10代の女性だったら間違いなく部屋を彼のポスターで埋めていただろうと思う。まじで惚れた。
+                <br />
+                伊藤英明の方は、今まで真面目で正義感の強いイメージがあったのだが、不真面目でグレー寄りの刑事の役が見事にはまっていた。あの整った顔で身勝手かつだらしない役というのは個人的にはかなりアリだと思う。
+                <br />
+                ちなみに渡辺謙はいつもの渡辺謙。
+              </p>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <div id="about">
+        <h2>About</h2>
+        <p>
+          このサイトはいしざきが今まで観た海外ドラマの（独断と偏見に満ちた）レビューをまとめたものです。
+        </p>
+      </div>
+    </main>
   );
 }
