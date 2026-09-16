@@ -1,16 +1,27 @@
+import styles from "./Header.module.scss";
+
+import Image from "next/image";
+
 export default function Header() {
   return (
     <div className="header">
-        <div className="navigation inner flex">
+        <div className={`${styles.navigation} inner flex`}>
           <div>
-            <h1><img src="pict/logo.svg" alt="" height="35" /></h1>
+            <h1>
+              <Image
+                src="pict/logo.svg"
+                alt=""
+                width={230}
+                height={35}
+              />
+            </h1>
           </div>
 
-          <button className="menu-button">
+          <button className={styles.menuButton}>
             <span className="material-symbols-outlined">menu</span>
           </button>
 
-          <nav className="menu">
+          <nav className={styles.menu}>
             <ul className="flex">
               <li><a href="#featured">Featured</a></li>
               <li><a href="#dramas">Dramas</a></li>
@@ -18,7 +29,7 @@ export default function Header() {
             </ul>
           </nav>
 
-          <nav className="pc-menu">
+          <nav className={styles.pcMenu}>
             <ul className="flex">
               <li><a href="#featured">Featured</a></li>
               <li><a href="#dramas">Dramas</a></li>

@@ -1,0 +1,661 @@
+// @/styles/shared/_mixins.scss
+
+// ================================================================
+// 共通mixin
+// ================================================================
+//
+// このファイルには、複数のSCSSファイルで繰り返し使う処理をまとめます。
+//
+// 使用するSCSSファイルでは、次のようにsharedディレクトリを読み込みます。
+//
+// @use "@/styles/shared" as *;
+//
+// 読み込み後は、次のようにmixinを使用できます。
+//
+// .example {
+//   @include content-width;
+// }
+//
+// mixinは、定義しただけではCSSとして出力されません。
+// @includeした場所に、mixin内のスタイルが展開されます。
+//
+// ================================================================
+
+
+// SassのMapを操作するための公式モジュール
+//
+// 以前使われていたグローバル関数のmap-get()ではなく、
+// 現在はmap.get()を使用します。
+@use "sass:map";
+
+// _variables.scssで定義した変数を、このファイル内で使用します。
+//
+// 「as *」を付けると、variables.$content-max-widthではなく、
+// $content-max-widthと短く書けます。
+@use "./variables" as *;
+
+
+// ================================================================
+// ブレークポイント
+// ================================================================
+//
+// 画面幅ごとのメディアクエリをMapとして管理します。
+//
+// キーの意味
+//
+// sm：スマートフォンを縦向きにしたときなど
+// md：タブレットを横向きにしたときなど
+// lg：ノートPCなど
+// xl：デスクトップPCなど
+//
+// この数値は絶対的な決まりではありません。
+// 制作するデザインに合わせて調整します。
+//
+// min-widthを使うため、基本スタイルをスマートフォン向けとして作り、
+// 必要に応じて大きな画面のスタイルを追加します。
+//
+// 推奨する記述順
+//
+// 基本スタイル
+// ↓
+// sm
+// ↓
+// md
+// ↓
+// lg
+// ↓
+// xl
+
+$breakpoints: (
+  // 480px以上
+  "sm": "(min-width: 480px)",
+
+  // 600px以上
+  "md": "(min-width: 600px)",
+
+  // 960px以上
+  "lg": "(min-width: 960px)",
+
+  // 1280px以上
+  "xl": "(min-width: 1280px)",
+);
+
+
+// ================================================================
+// メディアクエリ
+// ================================================================
+//
+// 指定したブレークポイント以上の画面に、スタイルを適用します。
+//
+// 引数
+//
+// $bp：$breakpointsに登録されているキー
+//      "sm"、"md"、"lg"、"xl"のいずれか
+//
+// 使用例
+//
+// .card-list {
+//   display: grid;
+//   grid-template-columns: 1fr;
+//
+//   @include mq("md") {
+//     grid-template-columns: repeat(2, 1fr);
+//   }
+//
+//   @include mq("lg") {
+//     grid-template-columns: repeat(3, 1fr);
+//   }
+// }
+//
+// 出力されるCSS
+//
+// .card-list {
+//   display: grid;
+//   grid-template-columns: 1fr;
+// }
+//
+// @media (min-width: 600px) {
+//   .card-list {
+//     grid-template-columns: repeat(2, 1fr);
+//   }
+// }
+//
+// @media (min-width: 960px) {
+//   .card-list {
+//     grid-template-columns: repeat(3, 1fr);
+//   }
+// }
+
+@mixin mq($bp) {
+  // 登録されていない名前を指定した場合は、
+  // コンパイルエラーを出して記述ミスに気づけるようにします。
+  @if not map.has-key($breakpoints, $bp) {
+    @error "ブレークポイント「#{$bp}」は登録されていません。sm、md、lg、xlのいずれかを指定してください。";
+  }
+
+  @media #{map.get($breakpoints, $bp)} {
+    @content;
+  }
+}
+
+
+// ================================================================
+// コンテンツ幅
+// ================================================================
+//
+// ページ内のコンテンツを中央に配置し、
+// 画面が広くなりすぎても一定の最大幅に収めます。
+//
+// 引数
+//
+// $width：コンテンツの横幅
+//         初期値は90%
+//
+// $max-width：コンテンツの最大幅
+//             初期値は_variables.scssの$content-max-width
+//
+// 使用例1：初期値のまま使う
+//
+// .inner {
+//   @include content-width;
+// }
+//
+// 使用例2：横幅を100%にする
+//
+// .inner {
+//   @include content-width(100%);
+// }
+//
+// 使用例3：横幅と最大幅の両方を変更する
+//
+// .inner {
+//   @include content-width(100%, 1200px);
+// }
+//
+// 名前付き引数でも指定できます。
+//
+// .inner {
+//   @include content-width(
+//     $width: 100%,
+//     $max-width: 1200px
+//   );
+// }
+
+@mixin content-width(
+  $width: 90%,
+  $max-width: $content-max-width
+) {
+  width: $width;
+  max-width: $max-width;
+  // 要素を横方向の中央に配置する
+  margin-inline: auto;
+}
+
+// ================================================================
+// 文字詰め
+// ================================================================
+//
+// 日本語の約物や文字間を詰めて、
+// 見出しなどを引き締めて表示したいときに使います。
+//
+// 使用例
+//
+// .section-title {
+//   @include tume;
+// }
+//
+// 注意
+//
+// フォントによって見え方が異なります。
+// 本文すべてへ一律に適用するのではなく、
+// 見出しやキャッチコピーなど、必要な場所で使用します。
+
+@mixin tume {
+  font-feature-settings: "palt" 1;
+}
+
+
+// ================================================================
+// アニメーション
+// ================================================================
+//
+// animation関連の指定をまとめて設定します。
+//
+// 最初の引数$nameだけが必須です。
+// そのほかの引数には初期値が設定されています。
+//
+// 引数
+//
+// $name
+//   使用する@keyframesの名前
+//
+// $duration
+//   1回のアニメーションが完了するまでの時間
+//   初期値：1s
+//
+// $timing
+//   アニメーションの進み方
+//   初期値：ease
+//
+// $delay
+//   アニメーションが始まるまでの待ち時間
+//   初期値：0s
+//
+// $iteration
+//   アニメーションを繰り返す回数
+//   初期値：1
+//
+// $direction
+//   アニメーションの再生方向
+//   初期値：normal
+//
+// $fill
+//   再生前後に適用するスタイル
+//   初期値：forwards
+//
+// 使用例1：名前だけを指定する
+//
+// .item {
+//   @include anime(fade-in);
+// }
+//
+// 使用例2：再生時間と待ち時間を指定する
+//
+// .item {
+//   @include anime(
+//     $name: fade-up,
+//     $duration: 0.8s,
+//     $delay: 0.2s
+//   );
+// }
+//
+// 使用例3：無限に繰り返す
+//
+// .loading-icon {
+//   @include anime(
+//     $name: rotate,
+//     $duration: 1s,
+//     $timing: linear,
+//     $iteration: infinite
+//   );
+// }
+//
+// アニメーションを使うには、対応する@keyframesも必要です。
+//
+// @keyframes fade-up {
+//   from {
+//     opacity: 0;
+//     translate: 0 30px;
+//   }
+//
+//   to {
+//     opacity: 1;
+//     translate: 0 0;
+//   }
+// }
+
+@mixin anime(
+  $name,
+  $duration: 1s,
+  $timing: ease,
+  $delay: 0s,
+  $iteration: 1,
+  $direction: normal,
+  $fill: forwards
+) {
+  animation-name: $name;
+  animation-duration: $duration;
+  animation-timing-function: $timing;
+  animation-delay: $delay;
+  animation-iteration-count: $iteration;
+  animation-direction: $direction;
+  animation-fill-mode: $fill;
+}
+
+
+// ================================================================
+// animation-timing-functionの主な値
+// ================================================================
+//
+// ease
+//   最初と最後がゆっくりになります。
+//
+// linear
+//   最初から最後まで同じ速度で進みます。
+//
+// ease-in
+//   ゆっくり始まります。
+//
+// ease-out
+//   ゆっくり終わります。
+//
+// ease-in-out
+//   ゆっくり始まり、ゆっくり終わります。
+//
+// cubic-bezier()
+//   進行速度を細かく調整します。
+//
+// 例
+//
+// @include anime(
+//   $name: fade-in,
+//   $timing: cubic-bezier(0.22, 1, 0.36, 1)
+// );
+
+
+// ================================================================
+// animation-iteration-countの主な値
+// ================================================================
+//
+// 1、2、3など
+//   指定した回数だけ再生します。
+//
+// infinite
+//   無限に繰り返します。
+
+
+// ================================================================
+// animation-directionの主な値
+// ================================================================
+//
+// normal
+//   毎回、最初から最後へ向かって再生します。
+//
+// reverse
+//   毎回、最後から最初へ向かって再生します。
+//
+// alternate
+//   順方向と逆方向を交互に再生します。
+//   最初は順方向です。
+//
+// alternate-reverse
+//   逆方向と順方向を交互に再生します。
+//   最初は逆方向です。
+
+
+// ================================================================
+// animation-fill-modeの主な値
+// ================================================================
+//
+// none
+//   アニメーション外のスタイルを適用しません。
+//
+// forwards
+//   アニメーション終了時の状態を維持します。
+//
+// backwards
+//   待ち時間中にも、開始時の状態を適用します。
+//
+// both
+//   backwardsとforwardsの両方を適用します。
+
+
+// ================================================================
+// 背景
+// ================================================================
+//
+// 背景色、背景画像、位置、サイズなどをまとめて指定します。
+//
+// すべての引数に初期値があるため、
+// 必要なものだけを名前付き引数で指定できます。
+//
+// 引数
+//
+// $color
+//   背景色
+//
+// $image
+//   背景画像までのパス
+//
+// $position
+//   背景画像を配置する位置
+//
+// $size
+//   背景画像の表示サイズ
+//
+// $repeat
+//   背景画像を繰り返すかどうか
+//
+// $attachment
+//   スクロール時に背景画像を固定するかどうか
+//
+// $clip
+//   背景を描画する範囲
+//
+// $txt-color
+//   文字色
+//
+// 使用例1：背景色だけを指定する
+//
+// .section {
+//   @include bg($color: #000);
+// }
+//
+// 使用例2：背景画像を指定する
+//
+// .hero {
+//   @include bg(
+//     $color: #000,
+//     $image: "/images/hero.webp",
+//     $position: center,
+//     $size: cover,
+//     $txt-color: #fff
+//   );
+// }
+//
+// 使用例3：背景画像を右下へ配置する
+//
+// .section {
+//   @include bg(
+//     $image: "/images/decoration.svg",
+//     $position: right bottom,
+//     $size: 200px auto,
+//     $repeat: no-repeat
+//   );
+// }
+//
+// Next.jsのpublicディレクトリにある画像は、
+// 「/images/hero.webp」のように、先頭を/にして指定します。
+
+@mixin bg(
+  $color: unset,
+  $image: "",
+  $position: center,
+  $size: cover,
+  $repeat: no-repeat,
+  $attachment: scroll,
+  $clip: border-box,
+  $txt-color: inherit
+) {
+  background-color: $color;
+  background-position: $position;
+  background-size: $size;
+  background-repeat: $repeat;
+  background-attachment: $attachment;
+  background-clip: $clip;
+  color: $txt-color;
+
+  // 背景画像が指定されたときだけbackground-imageを出力します。
+  //
+  // 空のurl("")を出力すると、現在のページ自体を
+  // 背景画像として取得しようとする場合があるためです。
+  @if $image != "" {
+    background-image: url("#{$image}");
+  }
+}
+
+
+// ================================================================
+// background-positionの主な値
+// ================================================================
+//
+// left top
+//   左上
+//
+// center top
+//   上中央
+//
+// right top
+//   右上
+//
+// left center
+//   左中央
+//
+// center
+//   中央
+//
+// right center
+//   右中央
+//
+// left bottom
+//   左下
+//
+// center bottom
+//   下中央
+//
+// right bottom
+//   右下
+//
+// 数値や割合でも指定できます。
+//
+// background-position: 20px 50%;
+
+
+// ================================================================
+// background-sizeの主な値
+// ================================================================
+//
+// cover
+//   縦横比を維持しながら、表示領域全体を覆います。
+//   画像の一部が領域の外へはみ出すことがあります。
+//
+// contain
+//   縦横比を維持しながら、画像全体を領域内に表示します。
+//   領域に余白ができることがあります。
+//
+// auto
+//   画像本来の縦横比とサイズを基準に表示します。
+//
+// 数値でも指定できます。
+//
+// background-size: 200px auto;
+
+
+// ================================================================
+// background-repeatの主な値
+// ================================================================
+//
+// no-repeat
+//   背景画像を繰り返しません。
+//
+// repeat
+//   縦方向と横方向へ繰り返します。
+//
+// repeat-x
+//   横方向だけに繰り返します。
+//
+// repeat-y
+//   縦方向だけに繰り返します。
+
+
+// ================================================================
+// background-attachmentの主な値
+// ================================================================
+//
+// scroll
+//   要素のスクロールに合わせて背景も移動します。
+//
+// fixed
+//   ビューポートに対して背景を固定します。
+//
+// 注意
+//
+// fixedはスマートフォンで期待どおりに表示されない場合があります。
+// 実機で表示を確認してから採用します。
+
+
+// ================================================================
+// background-clipの主な値
+// ================================================================
+//
+// border-box
+//   borderの外側まで背景を描画します。
+//
+// padding-box
+//   paddingの外側まで背景を描画します。
+//
+// content-box
+//   コンテンツ領域だけに背景を描画します。
+//
+// text
+//   文字の形で背景を切り抜きます。
+//
+// textを使う場合は、文字色をtransparentにします。
+//
+// .gradient-text {
+//   @include bg(
+//     $clip: text,
+//     $txt-color: transparent
+//   );
+//
+//   background-image: linear-gradient(
+//     90deg,
+//     #ff6b6b,
+//     #ffd800
+//   );
+// }
+
+
+// ================================================================
+// Font Awesome
+// ================================================================
+//
+// 疑似要素へFont Awesomeのアイコンを表示します。
+//
+// このmixinを使う前に、Font Awesome本体を
+// プロジェクトへ読み込んでおく必要があります。
+//
+// 引数
+//
+// $unicode
+//   使用するアイコンのUnicode
+//
+// $fontSize
+//   アイコンの文字サイズ
+//   初期値：inherit
+//
+// $fontFamily
+//   Font Awesomeの種類
+//   初期値：Free
+//
+// $fontWeight
+//   アイコンのウェイト
+//   初期値：900
+//
+// 使用例
+//
+// .button::before {
+//   @include fontAwesome(
+//     $unicode: "\f105",
+//     $fontSize: 1rem
+//   ) {
+//     margin-right: 0.5em;
+//   }
+// }
+//
+// @contentがあるため、呼び出し側の{}内に
+// 追加のスタイルを書くことができます。
+
+@mixin fontAwesome(
+  $unicode,
+  $fontSize: inherit,
+  $fontFamily: Free,
+  $fontWeight: 900
+) {
+  content: $unicode;
+  font-family: "Font Awesome 6 #{$fontFamily}";
+  font-size: $fontSize;
+  font-weight: $fontWeight;
+
+  @content;
+}

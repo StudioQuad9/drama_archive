@@ -1,0 +1,39 @@
+// @/styles/shared/_variables.scss
+
+// サイトに適応するmax-widthとナビゲーションバーの高さ
+$content-max-width: 1080px;
+$headerHeight: 80px;
+
+// メインカラー
+$color-primary: #02014a;
+
+// サイト内で使う白と黒
+$color-white: #f9f6f2;    // オフホワイト（和紙風）
+$color-black: #333;
+$color-black-dark: #111;
+
+// テキストカラー
+$color-text: #2C3E50;
+
+// サイト内で使う色
+// $color-red: #EA5E7B;
+// $color-orange: #ffa527;
+// $color-emerald : #49BCBD;
+// $color-blue: #65AADD;
+// $color-green: #6AB259;
+// $color-purple: #A7587E;
+
+// font-size
+$fs-xs: 0.75rem;
+$fs-sm: 0.875rem;
+$fs-base: 1rem;
+$fs-lg5: 1.125rem;
+$fs-lg4: 1.25rem;
+$fs-lg3: 1.75rem;
+$fs-lg2: 2.5rem;
+$fs-lg1: 3.5rem;
+
+// line-height
+$lh-tight: 1.25;
+$lh-normal: 1.5;
+$lh-relaxed: 1.75;

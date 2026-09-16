@@ -1,0 +1,58 @@
+@use "@/styles/shared" as *;
+
+.navigation {
+  align-items: center;
+}
+
+.menuButton {
+  margin-left: auto;
+  font-size: 32px;
+  color: #000000;
+}
+
+.menu {
+  opacity: 0;
+  visibility: hidden;
+  display: grid;
+  position: fixed;
+  inset: 60px 0 0;
+  place-items: center;
+  background: rgb(var(--modal-color) / 0.8);
+  z-index: 1000;
+  transform: translateY(-30px);
+  transition: 0.5s;
+}
+
+.menu ul {
+  text-align: center;
+  flex-direction: column;
+}
+
+.menu li,
+.pcMenu li {
+  font-size: 1.1rem;
+  padding: 10px;
+}
+
+.menu li {
+  margin-top: 30px;
+  font-size: 1.5rem;
+}
+
+.menu a {
+  color: #ffffff;
+}
+
+.pcMenu {
+  display: none;
+
+  @include mq(md) {
+    display: block;
+    margin-left: auto;
+    align-items: center;
+  }
+}
+
+.pcMenu a:hover {
+  background: rgb(var(--accent));
+}
