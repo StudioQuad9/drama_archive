@@ -43,7 +43,7 @@ src/components/contents/
 // src/components/contents/DramaCard.jsx
 import styles from "./DramaCard.module.scss";
 
-export default function DramaCard({ drama, number }) {
+export default function DramaCard({ drama, num }) {
   const genres = drama.genres.join(" · ");
 
   return (
@@ -54,8 +54,8 @@ export default function DramaCard({ drama, number }) {
 
       <div className={styles.heading}>
         <h3 className={styles.title}>
-          <span className={styles.number}>
-            {String(number).padStart(2, "0")}
+          <span className={styles.num}>
+            {String(num).padStart(2, "0")}
           </span>
           {drama.title}
         </h3>
@@ -76,7 +76,7 @@ export default function DramaCard({ drama, number }) {
 `DramaCard`は、作品データを自分で探しません。
 
 ```jsx
-function DramaCard({ drama, number })
+function DramaCard({ drama, num })
 ```
 
 として、親から`props`で受け取ります。
@@ -121,7 +121,7 @@ function DramaCard({ drama, number })
   margin: 0;
 }
 
-.number,
+.num,
 .score {
   color: shared.$color-accent;
 }
@@ -150,7 +150,7 @@ export default function DramaList({ dramas }) {
           <DramaCard
             key={drama.id}
             drama={drama}
-            number={index + 1}
+            num={index + 1}
           />
         ))}
       </div>

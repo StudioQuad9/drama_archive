@@ -1,0 +1,8 @@
+// @/components/contents/DramaArchive.module.scss
+
+@use "@/styles/shared" as *;
+
+.archive {
+  display: grid;
+  gap: clamp(16px, calc(4.35px + 3.107vw), 64px);
+}

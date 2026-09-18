@@ -1,0 +1,118 @@
+// src/components/cotents/DramaCard.moduleu.scss
+
+@use "@/styles/shared" as *;
+
+.card {
+  display: grid;
+  grid-template-columns:
+    clamp(72px, 22vw, 96px)
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 12px;  
+  position: relative;
+  height: 100%;
+  padding: 8px;
+  padding-left: 0;
+  // スマホでは縦長のサムネール
+  & > :global(.img-wrapper) {
+    width: 100%;
+    aspect-ratio: 1 / 1.1;
+  }
+  @include mq(md) {
+    display: block;
+    padding: 8px;
+    border: 1px solid #000000;
+    box-shadow: 3px 3px #000000;
+    // md以上では通常の横長画像へ戻す
+    & > :global(.img-wrapper) {
+      width: auto;
+      aspect-ratio: 16 / 9;
+    }    
+  }
+}
+
+.score {
+  display: grid;
+  place-items: center;
+  position: absolute;
+  top: 8px;
+  right: 0;
+  width: 3.25rem;
+  margin: 0;
+  padding: 4px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  font-family: var(--sans-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1; 
+  background-color: rgb(var(--accent));
+  @include mq(md) {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1;
+    width: 5rem;
+    font-size: 1.6rem;
+  }
+  @include mq(lg) {
+    width: 4rem;
+    font-size: 1.2rem;
+  }
+}
+
+.body {
+  min-width: 0;
+  padding: 0 2rem 0 0 ;
+  @include mq(md) {
+    padding: 8px 0px 4px;
+  }
+}
+
+.heading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.order,
+.title {
+  font-family: var(--sans-serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.2;
+  @include mq(md) {
+    font-size: 1.8rem;
+  }
+  @include mq(md) {
+    font-size: 1.3rem;
+  }
+}
+
+.order {
+  flex: 0 0 auto;
+}
+// margin-right: 2.5vw;
+// @include mq(lg) {
+//   margin-right: 1.5vw;
+// }
+
+.title {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.information {
+  margin: 8px 0 0;
+  font-family: var(--sans-serif);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  @include mq(md) {
+    margin: 4px 0 0 2.5vw;
+  }
+  @include mq(lg) {
+    margin-left: 1.5vw
+  }
+}

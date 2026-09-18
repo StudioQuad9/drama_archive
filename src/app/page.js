@@ -1,34 +1,9 @@
-import Image from "next/image";
+import DramaArchive from "@/components/contents/DramaArchive";
 
 export default function Home() {
   return (
     <main className="inner">
-      <section id="featured">
-        <h2>Featured</h2>
-
-        <div className="open-modal" data-modal="modal-true-detective">
-          <Image
-            src="/pict/truedetective.avif"
-            alt="True Detective"
-            width={1920}
-            height={1534}
-          />
-          <p className="quote">
-            “The World needs bad men.”
-            <br />
-            —Rust Cohle
-          </p>
-          <h3>True Detective</h3>
-          <p className="score">10/10</p>
-        </div>
-        <p className="information">
-          4 sesons / Crime ∙ Mystery
-          <br />
-          2014 / HBO
-        </p>
-      </section>
-
-      <section id="modal-true-detective" className="modal">
+      {/* <section id="modal-true-detective" className="modal">
         <div className="modal-content">
           <h4>True Detective</h4>
           <div className="youtube">
@@ -64,9 +39,11 @@ export default function Home() {
             。って言っときながら、サイトを確認したら1話で切ったラヴクラフト・カントリーとアメリカン・ゴッドのオープニングもあったので、ジンクスの信頼度は低いかもしれない。でもかっこいい。
           </p>
         </div>
-      </section>
+      </section> */}
 
-      <section id="dramas">
+      <DramaArchive />
+
+      {/* <section id="dramas">
         <h2>Dramas</h2>
 
         <div className="drama-cards">
@@ -420,7 +397,7 @@ export default function Home() {
             </div>
           </section>
         </div>
-      </section>
+      </section> */}
 
       <div id="about">
         <h2>About</h2>
