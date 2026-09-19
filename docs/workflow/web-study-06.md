@@ -1,5 +1,172 @@
 # 第6章　mapとpropsで作品を表示する
 
+1. `<section id="featured">` `<section id="dramas">` 以外をコメントアウトする。
+1. `<section id="featured">` を `FeaturedDrama.jsx` へ
+
+1. `<section id="dramas">` を `DramaList.jsx` へ　それぞれカット＆ペーストする。
+1. コンポーネントの親子関係を作る。
+    * `page.js` に `DramaArchive` コンポーネントが表示できるように設定。
+    * `DramaArchive` コンポーネントに `FeaturedDrama` と `DramaList` コンポーネントが表示できるように設定。
+    * `DramaList` コンポーネントに `DramaCard` コンポーネントが表示できるように設定。
+    * スタイルは事前に用意した。構造を出力できるようになることに主眼を置いて進める。
+
+### @/app/page.js
+
+```jsx
+// @/app/page.js
+
+import DramaArchive from "@/components/contents/DramaArchive";
+
+export default function Home() {
+  return (
+    <main className="inner">
+      <DramaArchive />
+      ...
+      ...
+    </main>
+  );
+}
+```
+
+### @/components/contents/DramaArchive/index.jsx
+
+```jsx
+// @/components/contents/DramaArchive/index.jsx
+
+import FeaturedDrama from "@/components/contents/FeaturedDrama";
+import DramaList from "@/components/contents/DramaList";
+
+export default function DramaArchive() {
+  return (
+    <>
+      <FeaturedDrama />
+      <DramaList />
+    </>
+  );
+}
+```
+
+## @/components/contents/FeaturedDrama/index.jsx
+
+```jsx
+// @/components/contents/FeaturedDrama/index.jsx
+
+import Image from "next/image";
+
+export default function FeautreDrama() {
+  return (
+    <section id="featured">
+      <h2>Featured</h2>
+  
+      <div className="open-modal" data-modal="modal-true-detective">
+        <Image
+          src="/pict/truedetective.avif"
+          alt="True Detective"
+          width={1920}
+          height={1534}
+        />
+        <p className="quote">
+          “The World needs bad men.”
+          <br />
+          —Rust Cohle
+        </p>
+        <h3>True Detective</h3>
+        <p className="score">10/10</p>
+      </div>
+      <p className="information">
+        4 sesons / Crime ∙ Mystery
+        <br />
+        2014 / HBO
+      </p>
+    </section>
+  );
+}
+```
+
+## @/components/contents/DramaList/index.jsx
+
+```jsx
+// @/components/contents/DramaList/index.jsx
+
+import Image from "next/image";
+
+export default function DramaList() {
+  return (
+    <>
+      <section id="dramas">
+        <h2 className="heading2">Dramas</h2>
+
+        <ul className="list">
+          <li className="item">
+            <article className="card">
+              <div className="img-wrapper">
+                <Image 
+                  src="/pict/strangerthings.avif"
+                  alt="Stranger Things"
+                  width={1920}
+                  height={1076}                
+                />
+              </div>
+
+              <p className="score">
+                9/10
+              </p>
+
+              <div className="body">
+                <div className="heading">
+                  <span className="order">
+
+                  </span>
+                  <h3 className="title">
+                    Stranger Things
+                  </h3>
+                </div>
+
+                <p className="infomation">
+                  5 seasons / SF ∙ Juvenile
+                  <br />
+                  2016 / NETFLIX
+                </p>
+              </div>
+            </article>
+          </li>
+        </ul>
+      </section>
+    </>
+  );
+}
+```
+
+### @/components/contents/DramaCard/index/.jsx
+
+```jsx
+// @/components/contents/DramaCard/index/.jsx
+
+export default function DramaCard() {
+  return (
+    <></>
+  );
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 目的
 
 第5章で作ったデータから、作品カードと注目作品を生成します。
