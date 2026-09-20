@@ -71,7 +71,7 @@ export default function FeautreDrama() {
           —Rust Cohle
         </p>
         <h3>True Detective</h3>
-        <p className="score">10/10</p>
+        <div className="score">10/10</p>
       </div>
       <p className="information">
         4 sesons / Crime ∙ Mystery
@@ -108,7 +108,7 @@ export default function DramaList() {
                 />
               </div>
 
-              <p className="score">
+              <div className="score">
                 9/10
               </p>
 
@@ -148,8 +148,281 @@ export default function DramaCard() {
   );
 }
 ```
+5. `data` を `props` でコンポーネントへ渡していく。
+    * **データを読み込んで表示させてみる。**
 
+```jsx
+// @/components/contents/DramaArchive/index.jsx
 
+import FeaturedDrama from "@/components/contents/FeaturedDrama";
+import DramaList from "@/components/contents/DramaList";
+import { dramas } from "@/data/dramas"
+
+export default function DramaArchive() {
+  const dramaTitleArr = dramas.map((drama) => {
+    return drama.title;
+  });
+  console.log(dramaTitleArr);
+
+  const featuredContents = dramas.find((drama) => {
+    return drama.featured;
+  });
+  console.log(featuredContents);
+  console.log(featuredContents.title);
+
+  return (
+    <>
+      <FeaturedDrama dramas={dramas} />
+      <DramaList dramas={dramas} />
+    </>
+  );
+}
+```
+
+    * **`FeaturedDrama` と `DramaList` コンポーネントにデータを振り分ける。そしてそれぞれのコンポーネントへ `props` として渡す。**
+
+```jsx
+// @/components/contents/DramaArchive/index.jsx
+
+import FeaturedDrama from "@/components/contents/FeaturedDrama";
+import DramaList from "@/components/contents/DramaList";
+import { dramas } from "@/data/dramas"
+
+export default function DramaArchive() {
+  // featureDramaのデータを抜き出す。
+  const featureDrama = dramas.find((drama) => {
+    return drama.featured;
+  });
+  
+  // featureDramaをコンソールに出力してみる。
+  
+  // oterDramasのデータを抜き出す。
+  const otherDramas = dramas.filter((drama) => {
+    return !drama.featured;
+  }).sort((a, b) => {
+    // ミリ秒を返しその値を比較してソート。そして配列に格納する。
+    // ミリ秒はどんなものかコンソールに出力してみる。
+    return Date.parse(b.publishedAt) - Date.parse(a.publishedAt)
+  });
+  
+  // otherDramasをコンソールに出力してみる。
+
+  return (
+    <>
+      <FeaturedDrama dramas={featureDrama} />
+      <DramaList dramas={otherDramas} />
+    </>
+  );
+}
+```
+
+    * **`FeaturedDrama` で `props` を受けて `JSX` で値を展開する**
+
+```text
+大枠であるHeroに、特集記事があり、ビジュアルと説明文という構造を持っていると言う形で変更してみる。 
+
+article.featured
+  .visual
+    .img-wrapper
+      img
+    .quote
+    .title
+    .score
+  .information
+```
+
+```jsx
+// @/components/contents/FeaturedDrama/index.jsx
+
+import Image from "next/image";
+import styles from "./FeaturedDrama.module.scss";
+
+export default function FeautreDrama({ drama }) {
+
+  // プラットフォームは配列なので、文字列に変換して変数に格納する。
+  const platform = drama.platforms.length === 1
+    ? drama.platforms[0]
+    : drama.platforms.join(" ・ ");
+  console.log(platform);
+
+  return (
+    <section id="featured">
+      <h2>Featured</h2>
+  
+      <article className="featured">
+        <div className="visual">
+          <div className="img-wrapper">
+            <Image
+              src="/pict/truedetective.avif" // <=
+              alt="True Detective" // <=
+              width={1920}
+              height={1534}
+            />
+          </div>
+
+          <div className="quote">
+            “The World needs bad men.” {/* <= */}
+            <br />
+            —Rust Cohle {/* <= */}
+          </div>
+
+          <h3 className="title">
+            True Detective {/* <= */}
+          </h3>
+          <div className="score">
+            10/10 {/* <= */}
+          </div>
+        </div>
+      </article>
+
+      <p className="information">
+        4 sesons / Crime ∙ Mystery {/* <= */}
+        <br />
+        2014 / HBO {/* <= */}
+      </p>
+    </section>
+  );
+}
+```
+
+    * **`DramaList` で `props` を受けて `JSX` で値を展開する**
+
+```text
+本文には、それぞれの記事がリスト形式で表示されるという構造に変更してみる。 
+
+ul.list
+  li.item
+    article.card
+      .img-wrapper
+        Image
+      .score
+      .body
+        .heading
+          span.order
+          h3.title
+        p.information
+```
+
+```jsx
+// @/components/contents/DramaList/index.jsx
+
+import Image from "next/image";
+
+export default function DramaList() {
+  return (
+    <>
+      <section id="dramas">
+        <h2 className="heading2">Dramas</h2>
+
+        <ul className="list">
+          <li className="item">
+            <article className="card">
+              <div className="img-wrapper">
+                <Image 
+                  src="/pict/strangerthings.avif" // <=
+                  alt="Stranger Things" // <=
+                  width={1920}
+                  height={1076}                
+                />
+              </div>
+
+              <div className="score">
+                9/10 {/* <= */}
+              </div>
+
+              <div className="body">
+                <div className="heading">
+                  <span className="order">
+                     {/* <= */}
+                  </span>
+                  <h3 className="title">
+                    Stranger Things {/* <= */}
+                  </h3>
+                </div>
+
+                <p className="infomation">
+                  5 seasons / SF ∙ Juvenile {/* <= */}
+                  <br />
+                  2016 / NETFLIX {/* <= */}
+                </p>
+              </div>
+            </article>
+          </li>
+        </ul>
+      </section>
+    </>
+  );
+}
+```
+
+    * **`map` を使って `DramaCard` を展開する**
+    * **`li` 要素を `DramaCard` へコピー＆ペーストする。**
+    * **`DramaCard` コンポーネントを `DramaList` コンポーネントへ引っ張ってくる。**
+
+```jsx
+// @/components/contents/DramaList/index.jsx
+
+import DramaCard from "@/components/contents/DramaCard";
+
+export default function DramaList({ dramas }) {
+  return (
+    <>
+      <section id="dramas">
+        <h2 className="heading2">Dramas</h2>
+
+        <ul className="list">
+          {/* ここに処理を書く。 */}
+          <DramaCard drama={drama} />
+        </ul>
+      </section>
+    </>
+  );
+}
+```
+
+```jsx
+// @/components/contents/DramaCard/index/.jsx
+
+import Image from "next/image";
+
+export default function DramaCard({ drama }) {
+  return (
+    <li className="item">
+      <article className="card">
+        <div className="img-wrapper">
+          <Image 
+            src="/pict/strangerthings.avif" // <=
+            alt="Stranger Things" // <=
+            width={1920}
+            height={1076}                
+          />
+        </div>
+
+        <div className="score">
+          9/10 {/* <= */}
+        </div>
+
+        <div className="body">
+          <div className="heading">
+            <span className="order">
+                {/* <= */}
+            </span>
+            <h3 className="title">
+              Stranger Things {/* <= */}
+            </h3>
+          </div>
+
+          <p className="infomation">
+            5 seasons / SF ∙ Juvenile {/* <= */}
+            <br />
+            2016 / NETFLIX {/* <= */}
+          </p>
+        </div>
+      </article>
+    </li>
+  );
+}
+```
 
 
 
