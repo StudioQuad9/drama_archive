@@ -1,50 +1,27 @@
 // @/components/contents/DramaList/index.jsx
 
-import Image from "next/image";
+import DramaCard from "@/components/contents/DramaCard";
+import styles from "./DramaList.module.scss";
 
-export default function DramaList() {
+export default function DramaList({ dramas }) {
   return (
-    <>
-      <section id="dramas">
-        <h2 className="heading2">Dramas</h2>
+    <section id="dramas">
+      <h2 className={styles.heading2}>Dramas</h2>
 
-        <ul className="list">
-          <li className="item">
-            <article className="card">
-              <div className="img-wrapper">
-                <Image 
-                  src="/pict/strangerthings.avif"
-                  alt="Stranger Things"
-                  width={1920}
-                  height={1076}                
-                />
-              </div>
-
-              <p className="score">
-                9/10
-              </p>
-
-              <div className="body">
-                <div className="heading">
-                  <span className="order">
-
-                  </span>
-                  <h3 className="title">
-                    Stranger Things
-                  </h3>
-                </div>
-
-                <p className="infomation">
-                  5 seasons / SF ∙ Juvenile
-                  <br />
-                  2016 / NETFLIX
-                </p>
-              </div>
-            </article>
+      <ul className={styles.list}>
+        {dramas.map((drama, index) => (
+          <li
+            key={drama.id}
+            className={styles.item}
+          >
+            <DramaCard
+              drama={drama}
+              order={index + 1}
+              />
           </li>
-        </ul>
-      </section>
-    </>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -68,7 +45,7 @@ export default function DramaList() {
           />
         </div>
         <h4></h4>
-        <p className="score"></p>
+        <div className="score"></p>
       </div>
       <p className="information">
         5 seasons / SF ∙ Juvenile
@@ -80,28 +57,3 @@ export default function DramaList() {
 </section>
   */}
 
-// :::::: my code :::::
-// import DramaCard from "./DramaCard";
-// import styles from "./DramaList.module.scss";
-
-// export default function DramaList({ dramas }) {
-//   return (
-//     <section id="dramas">
-//       <h2 className={styles.heading2}>Dramas</h2>
-
-//       <ul className={styles.list}>
-//         {dramas.map((drama, index) => (
-//           <li
-//             key={drama.id}
-//             className={styles.item}
-//           >
-//             <DramaCard
-//               drama={drama}
-//               order={index + 1}
-//               />
-//           </li>
-//         ))}
-//       </ul>
-//     </section>
-//   );
-// }
