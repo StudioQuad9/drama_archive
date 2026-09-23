@@ -20,7 +20,7 @@
   @include mq(md) {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
-    & > .item:first-child {
+    & > .item:nth-of-type(4) {
       grid-row: span 2;
       // グローバルに書いている設定をmodule.scss内で書ける
       :global(.img-wrapper) {
@@ -30,7 +30,7 @@
   }
   @include mq(lg) {
     grid-template-columns: repeat(3, 1fr);
-    & > .item:first-child {
+    & > .item:nth-of-type(4) {
       grid-column: span 2;
       // グローバルに書いている設定をmodule.scss内で書ける
       :global(.img-wrapper) {

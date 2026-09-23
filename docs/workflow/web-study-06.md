@@ -727,3 +727,54 @@ DramaCard
 git add .
 git commit -m "Render drama content from structured data"
 ```
+
+## 補足
+### Markdownのリンクを表示する
+
+```bash
+$ npm install react-markdown
+```
+
+`react-markdown` をインストール。レビュー本文はMarkdownで書きます。リンクは次のように記述します。
+
+```md
+[［Antibody］（https://antibody.tv/）](https://antibody.tv/)
+```
+
+JSXでは、`ReactMarkdown`を使ってレビューを表示します。
+
+`ReactMarkdown` の `components` 属性に、リンクの変換方法を定義したオブジェクトを渡します。
+
+```jsx
+<ReactMarkdown
+  components={{
+    a: ({ node, children, ...props }) => (
+      <a
+        {...props}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {children}
+      </a>
+    ),
+  }}
+>
+  {drama.review}
+</ReactMarkdown>
+```
+
+`children`にはリンクとして表示する文字が入り、`props`には`href`などの属性が入ります。
+
+画面には、次のHTMLとして展開されます。
+
+```html
+<a
+  href="https://antibody.tv/"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  ［Antibody］（https://antibody.tv/）
+</a>
+```
+
+これにより、レビュー内に複数のリンクがあっても、すべて同じルールで新しいタブに表示できます。

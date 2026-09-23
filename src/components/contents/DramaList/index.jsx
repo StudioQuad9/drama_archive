@@ -24,36 +24,3 @@ export default function DramaList({ dramas }) {
     </section>
   );
 }
-
-{/* 
-::::: origin html :::::
-<section id="dramas">
-  <h2>Dramas</h2>
-
-  <div className="drama-cards">
-    <article
-      className="drama open-modal"
-      data-modal="modal-stranger-things"
-    >
-      <div className="flex">
-        <div className="thumbnail">
-          <Image
-            src="/pict/strangerthings.avif"
-            alt="Stranger Things"
-            width={1920}
-            height={1076}
-          />
-        </div>
-        <h4></h4>
-        <div className="score"></p>
-      </div>
-      <p className="information">
-        5 seasons / SF ∙ Juvenile
-        <br />
-        2016 / NETFLIX
-      </p>
-    </article>
-  </div>
-</section>
-  */}
-

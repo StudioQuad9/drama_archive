@@ -1,5 +1,6 @@
-// @/components/contents/DramaCard/index/.jsx
+// @/components/contents/DramaCard/index.jsx
 
+import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import styles from "./DramaCard.module.scss";
 
@@ -30,8 +31,23 @@ export default function DramaCard({ drama, order }) {
         <p className={styles.information}>
           {drama.seasons} seasons / {drama.genres.join(" ∙ ")}
           <br />
-          {drama.year} / {drama.platform}
-        </p>
+          {drama.year} / {drama.platforms.join(" ∙ ")}
+        </p> 
+        <ReactMarkdown
+          components={{
+            a: ({ node, children, ...props }) => (
+              <a
+                {...props}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {children}
+              </a>
+            ),            
+          }}
+        >
+          {drama.review}
+        </ReactMarkdown>
       </div>
     </article>
   );
