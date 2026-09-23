@@ -17,7 +17,7 @@ export default function DramaArchive() {
   
   return (
     <>
-      <FeaturedDrama drama={featureDrama} />
+      <FeaturedDrama drama={featuredDrama} />
       <DramaList dramas={otherDramas} />
     </>
   );
