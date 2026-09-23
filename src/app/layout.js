@@ -1,3 +1,5 @@
+// @/app/layout.js
+
 import { Archivo, Zen_Kaku_Gothic_New, Cormorant_Garamond, Noto_Serif_JP } from "next/font/google";
 
 import Header from "@/components/Header";

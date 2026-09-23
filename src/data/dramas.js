@@ -1,4 +1,4 @@
-// src/data/dramas.js
+// @/data/dramas.js
 
 // 時刻に関しては、ターミナルに以下を入力して時間の値を得る。
 // $ date -Iseconds
