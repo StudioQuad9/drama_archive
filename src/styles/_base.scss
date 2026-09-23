@@ -177,13 +177,11 @@ a {
 }
 
 /* モーダルウィンドウを開く */
-.modal.active,
-.menu.active {
+.modal.active {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
 }
-
 
 /* 各項目 */
 .header {

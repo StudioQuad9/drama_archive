@@ -33,7 +33,7 @@ export default function DramaCard({ drama, order }) {
           <br />
           {drama.year} / {drama.platforms.join(" ∙ ")}
         </p> 
-        <ReactMarkdown
+        {/* <ReactMarkdown
           components={{
             a: ({ node, children, ...props }) => (
               <a
@@ -47,7 +47,7 @@ export default function DramaCard({ drama, order }) {
           }}
         >
           {drama.review}
-        </ReactMarkdown>
+        </ReactMarkdown> */}
       </div>
     </article>
   );

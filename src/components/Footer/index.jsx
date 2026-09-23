@@ -1,4 +1,4 @@
-// @/components/contents/Footer/index.jsx
+// @/components/Footer/index.jsx
 
 export default function Footer() {
   return (
