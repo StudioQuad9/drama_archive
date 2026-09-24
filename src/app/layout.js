@@ -54,7 +54,7 @@ export default function RootLayout({ children }) {
         ${cormorant.variable}
         ${notoSerifJp.variable}
       `}
-      >
+    >
       <body>
         <Header />
         {children}

@@ -117,25 +117,25 @@ a {
   font-family: var(--sans-serif);
 }
 
-.open-modal {
-  cursor: pointer;
-}
+// .open-modal {
+//   cursor: pointer;
+// }
 
 /* モーダルウィンドウのマスク部分 */
-.modal {
-  opacity: 0;
-  visibility: hidden;
-  display: grid;
-  position: fixed;
-  inset: 0;
-  place-items: center;
-  padding: 20px;
-  background: rgb(var(--modal-color) / 0.7);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
-  transform: translateY(-30px);
-  transition: 0.5s;
-}
+// .modal {
+//   opacity: 0;
+//   visibility: hidden;
+//   display: grid;
+//   position: fixed;
+//   inset: 0;
+//   place-items: center;
+//   padding: 20px;
+//   background: rgb(var(--modal-color) / 0.7);
+//   backdrop-filter: blur(4px);
+//   z-index: 1000;
+//   transform: translateY(-30px);
+//   transition: 0.5s;
+// }
 
 /* モーダルウィンドウ */
 .modal-content {
@@ -177,16 +177,19 @@ a {
 }
 
 /* モーダルウィンドウを開く */
-.modal.active {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
+// .modal.active {
+//   opacity: 1;
+//   visibility: visible;
+//   transform: translateY(0);
+// }
 
 /* 各項目 */
 .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: $header-height;
   border-bottom: 3px solid black;
-  padding: 10px 0;
 }
 
 

@@ -1,0 +1,26 @@
+// @/components/ui/Modal/Modal.module.scss
+
+@use "@/styles/shared" as *;
+
+.modal {
+  display: grid;
+  place-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  inset: 0;
+  background-color: rgba($color: $color-black, $alpha: .9);
+  z-index: 100;
+  & > .modalBtn {
+    display: grid;
+    place-content: center;
+    position: absolute;
+    top: 15px;
+    right: 18px;
+    font-size: .7rem;
+    color: $color-white;
+    & > .cross {
+      margin: 0 auto;
+    }
+  }
+}
