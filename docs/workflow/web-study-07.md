@@ -397,7 +397,7 @@ onClick={toggleMenu()}
 .menu {
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-30px);
+  transform: translateY(-50%);
 }
 
 .menu.active {
@@ -438,7 +438,7 @@ React版では、この`active`クラスを使いません。
 .menu {
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-30px);
+  transform: translateY(-50%);
   transition: 0.5s;
 }
 ```
