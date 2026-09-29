@@ -1,276 +1,303 @@
-# 第10章　スクロールに合わせて要素を表示する
+# 第10章　データを絞り込み・並べ替える
 
 ## 目的
 
-元サイトの`IntersectionObserver`を、対象ごとに再利用できる`ScrollReveal`コンポーネントへ変更します。
+作品データを表示するだけでなく、利用者が選んだ条件から表示内容を組み立てます。
 
 ```text
-IntersectionObserver
+元のdramas
 ↓
-要素が表示範囲へ入る
+filter()で絞り込む
 ↓
-stateを更新する
+sort()で並べ替える
 ↓
-CSS Moduleのクラスが変わる
-↓
-transitionが動く
+map()で表示する
 ```
 
-第8章で学んだ`useEffect`、cleanup、`useRef`の復習でもあります。
+元データは変更せず、現在の条件から表示用の配列を作ることが重要です。
 
 ---
 
-## 1. 元の実装との違い
+## 1. 絞り込み条件をstateで持つ
 
-元のJavaScriptでは、`querySelectorAll()`でページ全体から対象を探していました。
-
-Reactでは、ScrollReveal自身が担当する一つの要素を`ref`で参照します。
-
-```text
-ページ全体から対象を探す
-→ しない
-
-コンポーネントが自分の要素をrefで参照する
-→ 今回の方法
-```
-
----
-
-## 2. ファイルを作る
-
-```text
-src/components/ui/ScrollReveal/
-├── index.jsx
-└── ScrollReveal.module.scss
-```
-
----
-
-## 3. ScrollRevealを作る
+`DramaArchive.jsx`へ二つのstateを追加します。
 
 ```jsx
-// src/components/ui/ScrollReveal/index.jsx
-"use client";
+const [selectedGenre, setSelectedGenre] = useState("all");
+const [sortOrder, setSortOrder] = useState("default");
+```
 
-import { useEffect, useRef, useState } from "react";
+```text
+selectedGenre
+→ どのジャンルを表示するか
 
-import styles from "./ScrollReveal.module.scss";
+sortOrder
+→ どの順番で表示するか
+```
 
-const directionClasses = {
-  up: styles.up,
-  down: styles.down,
-  left: styles.left,
-  right: styles.right,
-};
+これらは利用者の操作によって画面表示が変わるため、`useRef`ではなく`useState`を使います。
 
-export default function ScrollReveal({
-  children,
-  direction = "up",
-  delay = 0,
-  once = true,
-  className = "",
+---
+
+## 2. データからジャンル一覧を作る
+
+選択肢も作品データから作ります。
+
+```jsx
+const genres = [
+  ...new Set(dramas.flatMap((drama) => drama.genres)),
+];
+```
+
+処理を分けて考えます。
+
+```text
+flatMap()
+→ 全作品のgenresを一つの配列にする
+
+new Set()
+→ 重複を取り除く
+
+[...]
+→ 再び配列にする
+```
+
+ジャンルをコードへ直接二重管理しないため、新しいジャンルを作品データへ追加すると選択肢にも反映されます。
+
+---
+
+## 3. 表示用の配列を作る
+
+```jsx
+const filteredDramas =
+  selectedGenre === "all"
+    ? dramas
+    : dramas.filter((drama) =>
+        drama.genres.includes(selectedGenre),
+      );
+```
+
+続いて、絞り込んだ結果を並べ替えます。
+
+```jsx
+const visibleDramas = [...filteredDramas].sort((a, b) => {
+  if (sortOrder === "score-desc") {
+    return b.score - a.score;
+  }
+
+  if (sortOrder === "year-desc") {
+    return b.year - a.year;
+  }
+
+  return dramas.indexOf(a) - dramas.indexOf(b);
+});
+```
+
+`[...filteredDramas]`で配列を複製してから`sort()`しています。元の`dramas`を直接並べ替えないためです。
+
+`visibleDramas`は新しいstateではありません。既存のデータとstateから計算できる値です。
+
+---
+
+## 4. DramaControlsを作る
+
+```text
+src/components/contents/
+├── DramaControls.jsx
+└── DramaControls.module.scss
+```
+
+```jsx
+// src/components/contents/DramaControls.jsx
+import styles from "./DramaControls.module.scss";
+
+export default function DramaControls({
+  genres,
+  selectedGenre,
+  sortOrder,
+  onGenreChange,
+  onSortChange,
 }) {
-  const elementRef = useRef(null);
-  const [isInView, setIsInView] = useState(false);
-
-  useEffect(() => {
-    const element = elementRef.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-
-          if (once) {
-            observer.unobserve(entry.target);
-          }
-        } else if (!once) {
-          setIsInView(false);
-        }
-      },
-      {
-        root: null,
-        rootMargin: "0px 0px -10%",
-        threshold: 0.1,
-      },
-    );
-
-    observer.observe(element);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [once]);
-
-  const classes = [
-    styles.reveal,
-    directionClasses[direction] ?? directionClasses.up,
-    isInView ? styles.inView : "",
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
   return (
-    <div
-      ref={elementRef}
-      className={classes}
-      style={{ "--reveal-delay": `${delay}ms` }}
-    >
-      {children}
+    <div className={styles.controls}>
+      <label className={styles.field}>
+        <span>ジャンル</span>
+        <select
+          value={selectedGenre}
+          onChange={(event) => onGenreChange(event.target.value)}
+        >
+          <option value="all">すべて</option>
+          {genres.map((genre) => (
+            <option key={genre} value={genre}>
+              {genre}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className={styles.field}>
+        <span>並び順</span>
+        <select
+          value={sortOrder}
+          onChange={(event) => onSortChange(event.target.value)}
+        >
+          <option value="default">登録順</option>
+          <option value="score-desc">評価が高い順</option>
+          <option value="year-desc">公開年が新しい順</option>
+        </select>
+      </label>
     </div>
   );
 }
 ```
 
-`directionClasses`によって、外から受け取った`up`などの値をCSS Modulesのクラスへ対応させています。
-
----
-
-## 4. SCSSを作る
+DramaControlsは、現在値をpropsで受け取り、変更を関数で親へ伝えます。作品データの絞り込みは担当しません。
 
 ```scss
-// src/components/ui/ScrollReveal/ScrollReveal.module.scss
-.reveal {
-  opacity: 0;
-  transition:
-    opacity 0.8s ease,
-    transform 0.8s ease;
-  transition-delay: var(--reveal-delay, 0ms);
-  will-change: opacity, transform;
+// src/components/contents/DramaControls.module.scss
+@use "@/styles/shared" as shared;
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-block-end: 32px;
 }
 
-.up {
-  transform: translateY(24px);
+.field {
+  display: grid;
+  gap: 8px;
 }
 
-.down {
-  transform: translateY(-24px);
+.field select {
+  min-height: 44px;
+  padding-inline: 12px;
 }
 
-.left {
-  transform: translateX(40px);
-}
-
-.right {
-  transform: translateX(-40px);
-}
-
-.inView {
-  opacity: 1;
-  transform: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-}
-```
-
-動きを減らすOS設定を利用している場合は、アニメーションなしで最初から表示します。
-
----
-
-## 5. DramaListへ適用する
-
-`DramaList.jsx`で読み込みます。
-
-```jsx
-import ScrollReveal from "@/components/ui/ScrollReveal";
-```
-
-`map()`の中を次のように変更します。
-
-```jsx
-{dramas.map((drama, index) => (
-  <ScrollReveal
-    key={drama.id}
-    direction="up"
-    delay={(index % 3) * 100}
-    className={styles.item}
-  >
-    <DramaCard
-      drama={drama}
-      number={index + 1}
-      onSelect={onSelect}
-    />
-  </ScrollReveal>
-))}
-```
-
-`key`は、`map()`が直接返す一番外側のScrollRevealへ移します。
-
-`DramaList.module.scss`へ追加します。
-
-```scss
-.item {
-  min-width: 0;
+.field select:focus-visible {
+  outline: 3px solid shared.$color-accent;
+  outline-offset: 2px;
 }
 ```
 
 ---
 
-## 6. delayを増やし続けない
+## 5. DramaListに該当件数を表示する
 
-次の書き方では、作品数が多いほど待ち時間が増えます。
-
-```jsx
-delay={index * 100}
-```
-
-今回は3列の表示を想定し、列ごとに遅延を戻します。
+`DramaList`へ渡す配列を`visibleDramas`へ変更します。
 
 ```jsx
-delay={(index % 3) * 100}
+<DramaList
+  dramas={visibleDramas}
+  onSelect={setSelectedDrama}
+/>
 ```
+
+DramaListでは、0件の場合も説明します。
+
+```jsx
+<p aria-live="polite">
+  {dramas.length}作品を表示しています
+</p>
+
+{dramas.length === 0 ? (
+  <p>条件に合う作品はありません。</p>
+) : (
+  <div className={styles.list}>
+    {/* これまでのmap() */}
+  </div>
+)}
+```
+
+`aria-live="polite"`により、操作後に件数が変わったことを支援技術へ伝えられます。
+
+---
+
+## 6. DramaArchiveへ組み込む
+
+ファイルの先頭で読み込みます。
+
+```jsx
+import DramaControls from "./DramaControls";
+```
+
+`DramaArchive.jsx`の主要部分は次のようになります。
+
+```jsx
+const [selectedDrama, setSelectedDrama] = useState(null);
+const [selectedGenre, setSelectedGenre] = useState("all");
+const [sortOrder, setSortOrder] = useState("default");
+
+const featuredDrama = dramas.find((drama) => drama.featured);
+
+const genres = [
+  ...new Set(dramas.flatMap((drama) => drama.genres)),
+];
+
+const filteredDramas =
+  selectedGenre === "all"
+    ? dramas
+    : dramas.filter((drama) =>
+        drama.genres.includes(selectedGenre),
+      );
+
+const visibleDramas = [...filteredDramas].sort((a, b) => {
+  if (sortOrder === "score-desc") return b.score - a.score;
+  if (sortOrder === "year-desc") return b.year - a.year;
+  return dramas.indexOf(a) - dramas.indexOf(b);
+});
+```
+
+JSXへ追加します。
+
+```jsx
+<DramaControls
+  genres={genres}
+  selectedGenre={selectedGenre}
+  sortOrder={sortOrder}
+  onGenreChange={setSelectedGenre}
+  onSortChange={setSortOrder}
+/>
+
+<DramaList
+  dramas={visibleDramas}
+  onSelect={setSelectedDrama}
+/>
+```
+
+---
+
+## 7. データの流れを確認する
 
 ```text
-1列目 → 0ms
-2列目 → 100ms
-3列目 → 200ms
-4列目 → 0ms
+利用者がジャンルを選ぶ
+↓
+selectedGenreが変わる
+↓
+filteredDramasを計算し直す
+↓
+visibleDramasが変わる
+↓
+DramaListが新しい配列をmap()する
 ```
 
-演出のために、後ろの情報が長時間読めなくなる状態を避けます。
-
----
-
-## 7. Effectとcleanupを確認する
-
-```text
-コンポーネントを表示
-↓
-observer.observe(element)
-
-コンポーネントを外す
-↓
-observer.disconnect()
-```
-
-Modalではイベント監視を解除しました。ScrollRevealではObserverを解除します。
-
-対象は違いますが、外部の仕組みと同期し、最後に片付ける考え方は同じです。
+DOMを直接削除・追加していません。データとstateから、その時点で必要な表示をReactに作ってもらっています。
 
 ---
 
 ## 今日の確認
 
-- [ ] ScrollRevealが自分の要素をrefで参照している
-- [ ] 要素が表示範囲へ入るとstateが変わる
-- [ ] CSS Modulesのクラスによって表示が変わる
-- [ ] 一度表示した要素を監視から外した
-- [ ] コンポーネント終了時にObserverを解除した
-- [ ] `key`をmap直下の要素へ付けた
-- [ ] `prefers-reduced-motion`へ対応した
-- [ ] 遅延が増え続けないことを確認した
+- [ ] `filter()`で条件に合う作品を取得した
+- [ ] 複製した配列を`sort()`した
+- [ ] 元の`dramas`を直接変更していない
+- [ ] ジャンル選択肢も作品データから生成した
+- [ ] 計算できる値を重複したstateにしなかった
+- [ ] 0件の場合の表示を用意した
+- [ ] 操作から再表示までのデータの流れを説明できる
 
 ## Git
 
 ```bash
 git add .
-git commit -m "Add reusable scroll reveal animation"
+git commit -m "Filter and sort dramas from shared data"
 ```

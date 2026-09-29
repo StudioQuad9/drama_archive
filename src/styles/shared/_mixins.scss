@@ -164,10 +164,11 @@ $breakpoints: (
 // }
 
 @mixin content-width(
+  $width: 100%,
   $max-width: 900px,
   $gutter: 20px,
 ) {
-  width: 100%;
+  width: $width;
   max-width: $max-width;
   margin-inline: auto;
   padding-inline: $gutter;

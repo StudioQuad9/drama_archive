@@ -1,303 +1,446 @@
-# 第12章　データを絞り込み・並べ替える
+# 第12章　SwiperでHeroスライドを作る
 
 ## 目的
 
-作品データを表示するだけでなく、利用者が選んだ条件から表示内容を組み立てます。
+複数のHero画像を一定時間ごとに切り替えるスライドを、Swiperで実装します。
+
+この章では、ライブラリへ任せる部分と、自分たちで管理する部分を分けます。
 
 ```text
-元のdramas
-↓
-filter()で絞り込む
-↓
-sort()で並べ替える
-↓
-map()で表示する
-```
+Swiperへ任せる
+→ スライド移動、タッチ操作、ループ、自動再生
 
-元データは変更せず、現在の条件から表示用の配列を作ることが重要です。
+自分たちで管理する
+→ 画像データ、見た目、再生・停止ボタン、利用者への配慮
+```
 
 ---
 
-## 1. 絞り込み条件をstateで持つ
+## 1. ライブラリを使う理由
 
-`DramaArchive.jsx`へ二つのstateを追加します。
+スライドを一から作る場合、次の処理が必要です。
 
-```jsx
-const [selectedGenre, setSelectedGenre] = useState("all");
-const [sortOrder, setSortOrder] = useState("default");
-```
+- 現在の画像を管理する
+- 一定時間で次へ移動する
+- 最後から最初へ戻る
+- タッチ操作へ対応する
+- アニメーションを管理する
+- キーボードや支援技術へ対応する
 
-```text
-selectedGenre
-→ どのジャンルを表示するか
-
-sortOrder
-→ どの順番で表示するか
-```
-
-これらは利用者の操作によって画面表示が変わるため、`useRef`ではなく`useState`を使います。
+一般的なUIは、実績のあるライブラリを利用する選択肢があります。ただし、導入しただけでアクセシビリティやデザインが完成するわけではありません。
 
 ---
 
-## 2. データからジャンル一覧を作る
+## 2. Swiperをインストールする
 
-選択肢も作品データから作ります。
-
-```jsx
-const genres = [
-  ...new Set(dramas.flatMap((drama) => drama.genres)),
-];
+```bash
+npm install swiper
 ```
 
-処理を分けて考えます。
-
-```text
-flatMap()
-→ 全作品のgenresを一つの配列にする
-
-new Set()
-→ 重複を取り除く
-
-[...]
-→ 再び配列にする
-```
-
-ジャンルをコードへ直接二重管理しないため、新しいジャンルを作品データへ追加すると選択肢にも反映されます。
+インストール後、`package.json`へSwiperが追加されたことを確認します。
 
 ---
 
-## 3. 表示用の配列を作る
-
-```jsx
-const filteredDramas =
-  selectedGenre === "all"
-    ? dramas
-    : dramas.filter((drama) =>
-        drama.genres.includes(selectedGenre),
-      );
-```
-
-続いて、絞り込んだ結果を並べ替えます。
-
-```jsx
-const visibleDramas = [...filteredDramas].sort((a, b) => {
-  if (sortOrder === "score-desc") {
-    return b.score - a.score;
-  }
-
-  if (sortOrder === "year-desc") {
-    return b.year - a.year;
-  }
-
-  return dramas.indexOf(a) - dramas.indexOf(b);
-});
-```
-
-`[...filteredDramas]`で配列を複製してから`sort()`しています。元の`dramas`を直接並べ替えないためです。
-
-`visibleDramas`は新しいstateではありません。既存のデータとstateから計算できる値です。
-
----
-
-## 4. DramaControlsを作る
+## 3. Heroのファイルを作る
 
 ```text
 src/components/contents/
-├── DramaControls.jsx
-└── DramaControls.module.scss
+├── Hero.jsx
+└── Hero.module.scss
 ```
 
+Swiperはブラウザ上で動くため、HeroをClient Componentにします。
+
 ```jsx
-// src/components/contents/DramaControls.jsx
-import styles from "./DramaControls.module.scss";
+"use client";
 
-export default function DramaControls({
-  genres,
-  selectedGenre,
-  sortOrder,
-  onGenreChange,
-  onSortChange,
-}) {
-  return (
-    <div className={styles.controls}>
-      <label className={styles.field}>
-        <span>ジャンル</span>
-        <select
-          value={selectedGenre}
-          onChange={(event) => onGenreChange(event.target.value)}
-        >
-          <option value="all">すべて</option>
-          {genres.map((genre) => (
-            <option key={genre} value={genre}>
-              {genre}
-            </option>
-          ))}
-        </select>
-      </label>
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { A11y, Autoplay } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 
-      <label className={styles.field}>
-        <span>並び順</span>
-        <select
-          value={sortOrder}
-          onChange={(event) => onSortChange(event.target.value)}
-        >
-          <option value="default">登録順</option>
-          <option value="score-desc">評価が高い順</option>
-          <option value="year-desc">公開年が新しい順</option>
-        </select>
-      </label>
+import "swiper/css";
+import "swiper/css/a11y";
+
+import styles from "./Hero.module.scss";
+```
+
+```text
+Swiper
+→ スライド全体
+
+SwiperSlide
+→ 一枚ずつのスライド
+
+Autoplay
+→ 自動再生
+
+A11y
+→ スライドの状態を支援技術へ伝える補助
+```
+
+---
+
+## 4. 画像を配列にする
+
+画像を`public/pict`へ置きます。
+
+```text
+public/pict/
+├── hero01.avif
+├── hero02.avif
+└── hero03.avif
+```
+
+画像情報を配列にします。
+
+```jsx
+const heroImages = [
+  { src: "/pict/hero01.avif", alt: "" },
+  { src: "/pict/hero02.avif", alt: "" },
+  { src: "/pict/hero03.avif", alt: "" },
+];
+```
+
+背景演出として使い、画像内の情報をキャッチコピーでも伝えているため、ここでは`alt`を空にしています。画像自体に重要な情報がある場合は、その内容を`alt`へ書きます。
+
+---
+
+## 5. mapでスライドを作る
+
+```jsx
+{heroImages.map((image, index) => (
+  <SwiperSlide key={image.src}>
+    <div className={styles.image}>
+      <Image
+        src={image.src}
+        alt={image.alt}
+        fill
+        sizes="100vw"
+        preload={index === 0}
+      />
     </div>
+  </SwiperSlide>
+))}
+```
+
+4枚目を追加するときは、JSXを複製せず配列へ一件追加します。
+
+```text
+画像データを追加
+↓
+map()がSwiperSlideを追加
+```
+
+第6章の作品カードと同じ考え方です。
+
+---
+
+## 6. 自動再生を止められるようにする
+
+自動で動き続ける表示には、一時停止できるボタンを用意します。
+
+Swiper本体をstateへ保存します。
+
+```jsx
+const [swiper, setSwiper] = useState(null);
+const [isPlaying, setIsPlaying] = useState(true);
+```
+
+再生・停止を切り替えます。
+
+```jsx
+const toggleAutoplay = () => {
+  if (!swiper) return;
+
+  if (swiper.autoplay.running) {
+    swiper.autoplay.stop();
+    setIsPlaying(false);
+  } else {
+    swiper.autoplay.start();
+    setIsPlaying(true);
+  }
+};
+```
+
+動きを減らすOS設定の場合は、最初の自動再生を止めます。
+
+```jsx
+useEffect(() => {
+  if (!swiper) return;
+
+  const mediaQuery = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  );
+
+  const stopWhenReduced = () => {
+    if (mediaQuery.matches) {
+      swiper.autoplay.stop();
+      setIsPlaying(false);
+    }
+  };
+
+  stopWhenReduced();
+  mediaQuery.addEventListener("change", stopWhenReduced);
+
+  return () => {
+    mediaQuery.removeEventListener("change", stopWhenReduced);
+  };
+}, [swiper]);
+```
+
+OS設定によって停止した後でも、利用者が再生ボタンを押せば自分の意思で再開できます。
+
+---
+
+## 7. Heroの完成コード
+
+```jsx
+// src/components/contents/Hero.jsx
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { A11y, Autoplay } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+
+import "swiper/css";
+import "swiper/css/a11y";
+
+import styles from "./Hero.module.scss";
+
+const heroImages = [
+  { src: "/pict/hero01.avif", alt: "" },
+  { src: "/pict/hero02.avif", alt: "" },
+  { src: "/pict/hero03.avif", alt: "" },
+];
+
+export default function Hero() {
+  const [swiper, setSwiper] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  useEffect(() => {
+    if (!swiper) return;
+
+    const mediaQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+
+    const stopWhenReduced = () => {
+      if (mediaQuery.matches) {
+        swiper.autoplay.stop();
+        setIsPlaying(false);
+      }
+    };
+
+    stopWhenReduced();
+    mediaQuery.addEventListener("change", stopWhenReduced);
+
+    return () => {
+      mediaQuery.removeEventListener("change", stopWhenReduced);
+    };
+  }, [swiper]);
+
+  const toggleAutoplay = () => {
+    if (!swiper) return;
+
+    if (swiper.autoplay.running) {
+      swiper.autoplay.stop();
+      setIsPlaying(false);
+    } else {
+      swiper.autoplay.start();
+      setIsPlaying(true);
+    }
+  };
+
+  return (
+    <section className={styles.hero} aria-labelledby="hero-title">
+      <Swiper
+        className={styles.slider}
+        modules={[Autoplay, A11y]}
+        loop
+        autoplay={{
+          delay: 5000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
+        a11y={{
+          enabled: true,
+          containerMessage: "Drama Archive メインビジュアル",
+        }}
+        onSwiper={setSwiper}
+        onAutoplayStart={() => setIsPlaying(true)}
+        onAutoplayStop={() => setIsPlaying(false)}
+      >
+        {heroImages.map((image, index) => (
+          <SwiperSlide key={image.src}>
+            <div className={styles.image}>
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                sizes="100vw"
+                preload={index === 0}
+              />
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
+      <div className={styles.copy}>
+        <h1 id="hero-title">Drama Archive</h1>
+        <p>Stories that stay with us.</p>
+      </div>
+
+      <button
+        type="button"
+        className={styles.autoplayButton}
+        onClick={toggleAutoplay}
+        disabled={!swiper}
+      >
+        {isPlaying ? "スライドを一時停止" : "スライドを再生"}
+      </button>
+    </section>
   );
 }
 ```
 
-DramaControlsは、現在値をpropsで受け取り、変更を関数で親へ伝えます。作品データの絞り込みは担当しません。
+ボタンの文字も現在の状態に合わせて変えるため、次に実行できる操作が分かります。
+
+---
+
+## 8. HeroのSCSS
 
 ```scss
-// src/components/contents/DramaControls.module.scss
+// src/components/contents/Hero.module.scss
 @use "@/styles/shared" as shared;
 
-.controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-block-end: 32px;
+.hero {
+  position: relative;
+  width: 100%;
+  height: 70svh;
+  min-height: 500px;
+  overflow: hidden;
 }
 
-.field {
-  display: grid;
-  gap: 8px;
+.slider,
+.image {
+  width: 100%;
+  height: 100%;
 }
 
-.field select {
+.image {
+  position: relative;
+
+  img {
+    object-fit: cover;
+  }
+}
+
+.copy {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: calc(100% - 40px);
+  text-align: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.autoplayButton {
+  position: absolute;
+  z-index: 3;
+  right: 20px;
+  bottom: 20px;
   min-height: 44px;
-  padding-inline: 12px;
+  padding: 8px 16px;
+  border: 1px solid currentcolor;
+  color: shared.$color-text;
+  background: rgb(0 0 0 / 70%);
+  cursor: pointer;
 }
 
-.field select:focus-visible {
+.autoplayButton:focus-visible {
   outline: 3px solid shared.$color-accent;
-  outline-offset: 2px;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slider * {
+    transition-duration: 0.01ms !important;
+  }
 }
 ```
 
----
-
-## 5. DramaListに該当件数を表示する
-
-`DramaList`へ渡す配列を`visibleDramas`へ変更します。
-
-```jsx
-<DramaList
-  dramas={visibleDramas}
-  onSelect={setSelectedDrama}
-/>
-```
-
-DramaListでは、0件の場合も説明します。
-
-```jsx
-<p aria-live="polite">
-  {dramas.length}作品を表示しています
-</p>
-
-{dramas.length === 0 ? (
-  <p>条件に合う作品はありません。</p>
-) : (
-  <div className={styles.list}>
-    {/* これまでのmap() */}
-  </div>
-)}
-```
-
-`aria-live="polite"`により、操作後に件数が変わったことを支援技術へ伝えられます。
+キャッチコピーはSwiperの外側に置いているため、画像が変わっても同じ位置に残ります。
 
 ---
 
-## 6. DramaArchiveへ組み込む
-
-ファイルの先頭で読み込みます。
+## 9. page.jsへ配置する
 
 ```jsx
-import DramaControls from "./DramaControls";
+// src/app/page.js
+import Hero from "@/components/contents/Hero";
+import DramaArchive from "@/components/contents/DramaArchive";
+import styles from "./page.module.scss";
+
+export default function Home() {
+  return (
+    <main>
+      <Hero />
+
+      <div className={styles.main}>
+        <DramaArchive />
+      </div>
+    </main>
+  );
+}
 ```
 
-`DramaArchive.jsx`の主要部分は次のようになります。
-
-```jsx
-const [selectedDrama, setSelectedDrama] = useState(null);
-const [selectedGenre, setSelectedGenre] = useState("all");
-const [sortOrder, setSortOrder] = useState("default");
-
-const featuredDrama = dramas.find((drama) => drama.featured);
-
-const genres = [
-  ...new Set(dramas.flatMap((drama) => drama.genres)),
-];
-
-const filteredDramas =
-  selectedGenre === "all"
-    ? dramas
-    : dramas.filter((drama) =>
-        drama.genres.includes(selectedGenre),
-      );
-
-const visibleDramas = [...filteredDramas].sort((a, b) => {
-  if (sortOrder === "score-desc") return b.score - a.score;
-  if (sortOrder === "year-desc") return b.year - a.year;
-  return dramas.indexOf(a) - dramas.indexOf(b);
-});
-```
-
-JSXへ追加します。
-
-```jsx
-<DramaControls
-  genres={genres}
-  selectedGenre={selectedGenre}
-  sortOrder={sortOrder}
-  onGenreChange={setSelectedGenre}
-  onSortChange={setSortOrder}
-/>
-
-<DramaList
-  dramas={visibleDramas}
-  onSelect={setSelectedDrama}
-/>
-```
+Heroは画面幅いっぱい、DramaArchiveは第4章で決めたコンテンツ幅に収めています。
 
 ---
 
-## 7. データの流れを確認する
+## 10. ライブラリの境界を確認する
+
+Swiperへ渡している主な設定は次のとおりです。
 
 ```text
-利用者がジャンルを選ぶ
-↓
-selectedGenreが変わる
-↓
-filteredDramasを計算し直す
-↓
-visibleDramasが変わる
-↓
-DramaListが新しい配列をmap()する
+modules
+→ 使う機能
+
+loop
+→ 最後から最初へ戻る
+
+autoplay
+→ 自動再生の間隔と動作
+
+onSwiper
+→ 作成されたSwiper本体を受け取る
 ```
 
-DOMを直接削除・追加していません。データとstateから、その時点で必要な表示をReactに作ってもらっています。
+一方、画像配列、キャッチコピー、停止ボタン、SCSSは自分たちの責務です。
+
+パッケージを導入したときは、`package.json`と`package-lock.json`もGitへ記録します。将来更新するときは、表示と操作を確認してからバージョンを上げます。
 
 ---
 
 ## 今日の確認
 
-- [ ] `filter()`で条件に合う作品を取得した
-- [ ] 複製した配列を`sort()`した
-- [ ] 元の`dramas`を直接変更していない
-- [ ] ジャンル選択肢も作品データから生成した
-- [ ] 計算できる値を重複したstateにしなかった
-- [ ] 0件の場合の表示を用意した
-- [ ] 操作から再表示までのデータの流れを説明できる
+- [ ] Swiperをインストールした
+- [ ] HeroをClient Componentにした理由を説明できる
+- [ ] 画像配列からスライドを生成した
+- [ ] 最初の画像だけをpreloadした
+- [ ] 自動再生をボタンで停止・再開できる
+- [ ] 動きを減らすOS設定では最初に停止する
+- [ ] A11yモジュールを追加した
+- [ ] HeroのスタイルをCSS Moduleへ置いた
+- [ ] ライブラリと自作部分の責務を区別できる
 
 ## Git
 
 ```bash
 git add .
-git commit -m "Filter and sort dramas from shared data"
+git commit -m "Add controllable hero slider with Swiper"
 ```

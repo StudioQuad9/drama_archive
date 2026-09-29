@@ -24,7 +24,7 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;  
-  transform: translateY(-50%);
+  transform: translateY(-30px);
   transition: opacity .5s ease,
               visibility 0s linear .5s,
               transform .5s ease;

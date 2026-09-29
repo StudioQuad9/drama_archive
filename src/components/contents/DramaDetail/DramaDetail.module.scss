@@ -1,0 +1,57 @@
+// @/components/contents/DramaDetail/DramaDetail.module.scss
+
+@use "@/styles/shared" as *;
+
+.detail {
+  @include content-width (
+    $max-width: 800px,
+    $width: 90%
+  );
+  max-height: 100vh;
+  padding: 0 20px 20px;
+  background-color: rgba($color: $color-black-dark, $alpha: .9);
+  overflow-y: auto;
+}
+
+.title {
+  margin-bottom: 16px;
+  color: rgb(var(--accent));
+}
+
+.youtube {
+  width: 100%;
+  margin-inline: auto;
+  background-color: $color-black-dark;
+
+  & > iframe {
+    display: block;
+    width: 100%;
+    border: 0;
+    aspect-ratio: 16 / 9;
+    opacity: 0;
+    transition: opacity .15s ease-in-out;
+    &.isLoaded {
+      opacity: 1;
+    }
+  }
+}
+
+.reviewTitle {
+  margin-top: 20px;
+  color: $color-white;
+}
+
+.review {
+  margin: 20px 0 0;
+  color: $color-white;
+  line-height: 1.6;
+
+  & p {
+    text-align: justify;
+    white-space: pre-line;
+  }
+
+  & a {
+    color: rgb(var(--accent));
+  }
+}

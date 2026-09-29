@@ -18,7 +18,7 @@ export default function Modal({ isOpen, onClose, ariaLabel, children }) {
     setIsMounted(true);
   }, []);
 
-  console.log({ isOpen, isMounted });
+  // console.log({ isOpen, isMounted });
 
   // // 例1）
   // useEffect(() => {

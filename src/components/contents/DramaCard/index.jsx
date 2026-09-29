@@ -1,14 +1,16 @@
 // @/components/contents/DramaCard/index.jsx
 
-import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import styles from "./DramaCard.module.scss";
 
-export default function DramaCard({ drama, order }) {
+export default function DramaCard({ drama, order, onSelect }) {
   const displayOrder = String(order).padStart(2, "0");
 
   return (
-    <article className={styles.card}>
+    <article 
+      className={styles.card}
+      onClick={() => onSelect(drama)}
+    >
       <div className="img-wrapper">
         <Image
           src={drama.image}
@@ -33,21 +35,6 @@ export default function DramaCard({ drama, order }) {
           <br />
           {drama.year} / {drama.platforms.join(" ∙ ")}
         </p> 
-        {/* <ReactMarkdown
-          components={{
-            a: ({ node, children, ...props }) => (
-              <a
-                {...props}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {children}
-              </a>
-            ),            
-          }}
-        >
-          {drama.review}
-        </ReactMarkdown> */}
       </div>
     </article>
   );

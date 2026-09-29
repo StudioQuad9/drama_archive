@@ -3,7 +3,7 @@
 import DramaCard from "@/components/contents/DramaCard";
 import styles from "./DramaList.module.scss";
 
-export default function DramaList({ dramas }) {
+export default function DramaList({ dramas, onSelect }) {
   return (
     <section id="dramas">
       <h2 className={styles.heading2}>Dramas</h2>
@@ -17,7 +17,8 @@ export default function DramaList({ dramas }) {
             <DramaCard
               drama={drama}
               order={index + 1}
-              />
+              onSelect={onSelect}
+            />
           </li>
         ))}
       </ul>
