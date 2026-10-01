@@ -1,273 +1,506 @@
-# 第13章　チームで確認できる制作基準を作る
+# 第12章　SwiperでHeroスライドを作る
+
+はい、そのとおりです。
+
+`DramaArchive`ですでに特集作品を振り分けているので、その作品データをSwiperへ渡せます。
+
+```jsx
+const featuredDramas = dramas.filter((drama) => {
+  return drama.featured;
+});
+```
+
+```jsx
+<Hero
+  dramas={featuredDramas}
+  onSelect={handleSelectDrama}
+/>
+```
+
+Hero側では、受け取った特集作品をスライドにします。
+
+```jsx
+{dramas.map((drama) => (
+  <SwiperSlide key={drama.id}>
+    <Image
+      src={drama.image}
+      alt={`${drama.title}のイメージ`}
+      fill
+    />
+
+    <h2>{drama.title}</h2>
+
+    <p>{drama.quote}</p>
+
+    <button
+      type="button"
+      onClick={() => onSelect(drama)}
+    >
+      詳細を見る
+    </button>
+  </SwiperSlide>
+))}
+```
+
+つまり、すでにあるデータをそのまま使えます。
+
+```text
+featuredがtrueの作品を取り出す
+↓
+作品画像をSwiperへ表示
+↓
+タイトルをSwiperへ表示
+↓
+引用文やキャッチコピーを表示
+↓
+クリックした作品データをModalへ渡す
+↓
+DramaDetailを表示する
+```
+
+新しいHero専用データを別に作る必要はありません。足りない情報がある場合だけ、既存の`dramas`へ`heroImage`や`heroCopy`などを追加すればよいです。
 
 ## 目的
 
-完成したサイトを「自分のPCでは動く」状態から、別の制作者が確認・修正・引き継ぎできる状態へ進めます。
+複数のHero画像を一定時間ごとに切り替えるスライドを、Swiperで実装します。
 
-チーム制作では、コードの書き方だけでなく、変更理由と確認方法を共有することが重要です。
-
----
-
-## 1. 現在のファイル構成を確認する
+この章では、ライブラリへ任せる部分と、自分たちで管理する部分を分けます。
 
 ```text
-src/
-├── app/
-│   ├── globals.scss
-│   ├── layout.js
-│   ├── page.js
-│   └── page.module.scss
-├── components/
-│   ├── layout/
-│   │   ├── Header/
-│   │   ├── Footer/
-│   │   └── MobileMenu/
-│   ├── contents/
-│   │   ├── Hero.jsx
-│   │   ├── DramaArchive.jsx
-│   │   ├── FeaturedDrama.jsx
-│   │   ├── DramaControls.jsx
-│   │   ├── DramaList.jsx
-│   │   ├── DramaCard.jsx
-│   │   ├── DramaDetail.jsx
-│   │   └── 各コンポーネントの.module.scss
-│   └── ui/
-│       ├── Modal/
-│       └── ScrollReveal/
-├── data/
-│   └── dramas.js
-└── styles/
-    ├── _base.scss
-    ├── reset.css
-    └── shared/
-```
+Swiperへ任せる
+→ スライド移動、タッチ操作、ループ、自動再生
 
-各フォルダの責務を説明できないファイルがあれば、置き場所を見直します。
+自分たちで管理する
+→ 画像データ、見た目、再生・停止ボタン、利用者への配慮
+```
 
 ---
 
-## 2. READMEへ制作ルールを書く
+## 1. ライブラリを使う理由
 
-READMEへ、少なくとも次を追加します。
+スライドを一から作る場合、次の処理が必要です。
 
-````md
-## 開発方法
+- 現在の画像を管理する
+- 一定時間で次へ移動する
+- 最後から最初へ戻る
+- タッチ操作へ対応する
+- アニメーションを管理する
+- キーボードや支援技術へ対応する
 
-```bash
-npm install
-npm run dev
-```
-
-## 確認コマンド
-
-```bash
-npm run lint
-npm run lint:styles
-npm run build
-```
-
-## ファイルの役割
-
-- `app`: ページ、layout、全体スタイル
-- `components/layout`: 全ページ共通の構造
-- `components/contents`: Drama Archive固有の表示
-- `components/ui`: 内容に依存しない再利用UI
-- `data`: 表示する内容
-- `styles/shared`: 複数のSCSSから使う値とmixin
-
-## スタイルルール
-
-- サイト全体の指定だけをglobalへ置く
-- コンポーネント固有の指定はCSS Modulesへ置く
-- CSS Modulesのクラス名はcamelCaseにする
-- 色、ブレークポイント、z-indexは共有値を確認する
-- 新しい共通値は、二か所以上で必要になってから追加を検討する
-````
-
-READMEは完成報告ではなく、次の人が作業を始めるための入口です。
+一般的なUIは、実績のあるライブラリを利用する選択肢があります。ただし、導入しただけでアクセシビリティやデザインが完成するわけではありません。
 
 ---
 
-## 3. 自動確認を実行する
+## 2. Swiperをインストールする
 
 ```bash
-npm run lint
-npm run lint:styles
-npm run build
+npm install swiper
 ```
 
-役割は次のとおりです。
+インストール後、`package.json`へSwiperが追加されたことを確認します。
+
+---
+
+## 3. Heroのファイルを作る
 
 ```text
-lint
-→ JavaScript・JSXの問題を確認
-
-lint:styles
-→ CSS・SCSSの問題を確認
-
-build
-→ 公開用データを最後まで作れるか確認
+src/components/contents/
+├── Hero.jsx
+└── Hero.module.scss
 ```
 
-警告を数だけ減らすのではなく、メッセージを読み、どの制作ルールに反しているか確認します。
+Swiperはブラウザ上で動くため、HeroをClient Componentにします。
 
----
+```jsx
+"use client";
 
-## 4. ブラウザで確認する
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { A11y, Autoplay } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 
-自動確認だけでは、見た目と操作のすべては確認できません。
+import "swiper/css";
+import "swiper/css/a11y";
 
-### 画面幅
-
-- 375px前後のスマートフォン
-- 768px前後のタブレット
-- 1280px以上のPC
-
-### キーボード
-
-- Tabの順番が自然か
-- フォーカス位置が見えるか
-- MenuをEnterで開けるか
-- ModalをEscapeで閉じられるか
-- Modalを閉じると元の要素へ戻るか
-- スライドを停止できるか
-
-### 内容
-
-- 画像が欠けていないか
-- 見出しの順番が自然か
-- 絞り込みが0件のとき説明が出るか
-- 作品を追加しても表示が壊れないか
-- 長いタイトルやレビューでも崩れないか
-
-### 動き
-
-- `prefers-reduced-motion`で過度に動かないか
-- ScrollRevealのために情報が長時間隠れないか
-- Swiperを停止・再開できるか
-
----
-
-## 5. 変更を小さく分ける
-
-一つのcommitには、一つの説明可能な変更を入れます。
+import styles from "./Hero.module.scss";
+```
 
 ```text
-良い例
-Add genre filter to drama list
+Swiper
+→ スライド全体
 
-分かりにくい例
-fix various things
+SwiperSlide
+→ 一枚ずつのスライド
+
+Autoplay
+→ 自動再生
+
+A11y
+→ スライドの状態を支援技術へ伝える補助
 ```
-
-スタイル整理、機能追加、文章変更を一つのcommitへ混ぜないようにすると、レビューと修正の取り消しがしやすくなります。
 
 ---
 
-## 6. Pull Requestで共有する
+## 4. 画像を配列にする
 
-チームで作業する場合は、作業用branchを作ります。
+画像を`public/pict`へ置きます。
 
-```bash
-git switch -c feature/drama-filter
+```text
+public/pict/
+├── hero01.avif
+├── hero02.avif
+└── hero03.avif
 ```
 
-変更をcommitしてGitHubへ送ります。
+画像情報を配列にします。
 
-```bash
-git push -u origin feature/drama-filter
+```jsx
+const heroImages = [
+  { src: "/pict/hero01.avif", alt: "" },
+  { src: "/pict/hero02.avif", alt: "" },
+  { src: "/pict/hero03.avif", alt: "" },
+];
 ```
 
-GitHubでPull Requestを作り、次を記載します。
-
-```md
-## 目的
-
-何を解決する変更か
-
-## 主な変更
-
-- 変更点1
-- 変更点2
-
-## 確認方法
-
-1. 確認手順1
-2. 確認手順2
-
-## 確認結果
-
-- [ ] npm run lint
-- [ ] npm run lint:styles
-- [ ] npm run build
-- [ ] スマートフォン表示
-- [ ] PC表示
-- [ ] キーボード操作
-```
-
-レビューする側がコードを推測しなくても、目的と確認方法が分かる状態を目指します。
+背景演出として使い、画像内の情報をキャッチコピーでも伝えているため、ここでは`alt`を空にしています。画像自体に重要な情報がある場合は、その内容を`alt`へ書きます。
 
 ---
 
-## 7. コンポーネントをレビューする観点
+## 5. mapでスライドを作る
 
-### 責務
+```jsx
+{heroImages.map((image, index) => (
+  <SwiperSlide key={image.src}>
+    <div className={styles.image}>
+      <Image
+        src={image.src}
+        alt={image.alt}
+        fill
+        sizes="100vw"
+        preload={index === 0}
+      />
+    </div>
+  </SwiperSlide>
+))}
+```
 
-- 一つのコンポーネントが多くの役割を持ちすぎていないか
-- 表示だけの子が不要なstateを持っていないか
-- 共通UIに作品固有の処理が入っていないか
+4枚目を追加するときは、JSXを複製せず配列へ一件追加します。
 
-### データ
+```text
+画像データを追加
+↓
+map()がSwiperSlideを追加
+```
 
-- 同じ内容を複数ファイルへ直接書いていないか
-- 安定したIDをkeyに使っているか
-- 元配列を直接変更していないか
-- 計算できる値を重複したstateにしていないか
-
-### スタイル
-
-- コンポーネント固有スタイルがglobalへ漏れていないか
-- 共有値を理由なく重複定義していないか
-- クラス名から役割を判断できるか
-- フォーカス表示を消していないか
-
-### Next.js・React
-
-- 操作が不要なコンポーネントまでClient Componentにしていないか
-- Effectにcleanupが必要ではないか
-- ブラウザAPIをServer Componentで使っていないか
+第6章の作品カードと同じ考え方です。
 
 ---
 
-## 8. 完成の基準
+## 6. 自動再生を止められるようにする
 
-次のすべてを満たしたら、公開へ進みます。
+自動で動き続ける表示には、一時停止できるボタンを用意します。
 
-- 必要な画面と機能が揃っている
-- 元サイトの内容が失われていない
-- データ追加だけで一覧へ反映される
-- PCとモバイルのナビ情報が共通化されている
-- Modalをマウスとキーボードで操作できる
-- 自動再生を止められる
-- lint、Stylelint、buildが成功する
-- READMEだけで別の制作者が開発を始められる
-- Pull Requestに目的と確認方法が書かれている
+Swiper本体をstateへ保存します。
+
+```jsx
+const [swiper, setSwiper] = useState(null);
+const [isPlaying, setIsPlaying] = useState(true);
+```
+
+再生・停止を切り替えます。
+
+```jsx
+const toggleAutoplay = () => {
+  if (!swiper) return;
+
+  if (swiper.autoplay.running) {
+    swiper.autoplay.stop();
+    setIsPlaying(false);
+  } else {
+    swiper.autoplay.start();
+    setIsPlaying(true);
+  }
+};
+```
+
+動きを減らすOS設定の場合は、最初の自動再生を止めます。
+
+```jsx
+useEffect(() => {
+  if (!swiper) return;
+
+  const mediaQuery = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  );
+
+  const stopWhenReduced = () => {
+    if (mediaQuery.matches) {
+      swiper.autoplay.stop();
+      setIsPlaying(false);
+    }
+  };
+
+  stopWhenReduced();
+  mediaQuery.addEventListener("change", stopWhenReduced);
+
+  return () => {
+    mediaQuery.removeEventListener("change", stopWhenReduced);
+  };
+}, [swiper]);
+```
+
+OS設定によって停止した後でも、利用者が再生ボタンを押せば自分の意思で再開できます。
+
+---
+
+## 7. Heroの完成コード
+
+```jsx
+// src/components/contents/Hero.jsx
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { A11y, Autoplay } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+
+import "swiper/css";
+import "swiper/css/a11y";
+
+import styles from "./Hero.module.scss";
+
+const heroImages = [
+  { src: "/pict/hero01.avif", alt: "" },
+  { src: "/pict/hero02.avif", alt: "" },
+  { src: "/pict/hero03.avif", alt: "" },
+];
+
+export default function Hero() {
+  const [swiper, setSwiper] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  useEffect(() => {
+    if (!swiper) return;
+
+    const mediaQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+
+    const stopWhenReduced = () => {
+      if (mediaQuery.matches) {
+        swiper.autoplay.stop();
+        setIsPlaying(false);
+      }
+    };
+
+    stopWhenReduced();
+    mediaQuery.addEventListener("change", stopWhenReduced);
+
+    return () => {
+      mediaQuery.removeEventListener("change", stopWhenReduced);
+    };
+  }, [swiper]);
+
+  const toggleAutoplay = () => {
+    if (!swiper) return;
+
+    if (swiper.autoplay.running) {
+      swiper.autoplay.stop();
+      setIsPlaying(false);
+    } else {
+      swiper.autoplay.start();
+      setIsPlaying(true);
+    }
+  };
+
+  return (
+    <section className={styles.hero} aria-labelledby="hero-title">
+      <Swiper
+        className={styles.slider}
+        modules={[Autoplay, A11y]}
+        loop
+        autoplay={{
+          delay: 5000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
+        a11y={{
+          enabled: true,
+          containerMessage: "Drama Archive メインビジュアル",
+        }}
+        onSwiper={setSwiper}
+        onAutoplayStart={() => setIsPlaying(true)}
+        onAutoplayStop={() => setIsPlaying(false)}
+      >
+        {heroImages.map((image, index) => (
+          <SwiperSlide key={image.src}>
+            <div className={styles.image}>
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                sizes="100vw"
+                preload={index === 0}
+              />
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
+      <div className={styles.copy}>
+        <h1 id="hero-title">Drama Archive</h1>
+        <p>Stories that stay with us.</p>
+      </div>
+
+      <button
+        type="button"
+        className={styles.autoplayButton}
+        onClick={toggleAutoplay}
+        disabled={!swiper}
+      >
+        {isPlaying ? "スライドを一時停止" : "スライドを再生"}
+      </button>
+    </section>
+  );
+}
+```
+
+ボタンの文字も現在の状態に合わせて変えるため、次に実行できる操作が分かります。
+
+---
+
+## 8. HeroのSCSS
+
+```scss
+// src/components/contents/Hero.module.scss
+@use "@/styles/shared" as shared;
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 70svh;
+  min-height: 500px;
+  overflow: hidden;
+}
+
+.slider,
+.image {
+  width: 100%;
+  height: 100%;
+}
+
+.image {
+  position: relative;
+
+  img {
+    object-fit: cover;
+  }
+}
+
+.copy {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: calc(100% - 40px);
+  text-align: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.autoplayButton {
+  position: absolute;
+  z-index: 3;
+  right: 20px;
+  bottom: 20px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid currentcolor;
+  color: shared.$color-text;
+  background: rgb(0 0 0 / 70%);
+  cursor: pointer;
+}
+
+.autoplayButton:focus-visible {
+  outline: 3px solid shared.$color-accent;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slider * {
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+キャッチコピーはSwiperの外側に置いているため、画像が変わっても同じ位置に残ります。
+
+---
+
+## 9. page.jsへ配置する
+
+```jsx
+// src/app/page.js
+import Hero from "@/components/contents/Hero";
+import DramaArchive from "@/components/contents/DramaArchive";
+import styles from "./page.module.scss";
+
+export default function Home() {
+  return (
+    <main>
+      <Hero />
+
+      <div className={styles.main}>
+        <DramaArchive />
+      </div>
+    </main>
+  );
+}
+```
+
+Heroは画面幅いっぱい、DramaArchiveは第4章で決めたコンテンツ幅に収めています。
+
+---
+
+## 10. ライブラリの境界を確認する
+
+Swiperへ渡している主な設定は次のとおりです。
+
+```text
+modules
+→ 使う機能
+
+loop
+→ 最後から最初へ戻る
+
+autoplay
+→ 自動再生の間隔と動作
+
+onSwiper
+→ 作成されたSwiper本体を受け取る
+```
+
+一方、画像配列、キャッチコピー、停止ボタン、SCSSは自分たちの責務です。
+
+パッケージを導入したときは、`package.json`と`package-lock.json`もGitへ記録します。将来更新するときは、表示と操作を確認してからバージョンを上げます。
 
 ---
 
 ## 今日の確認
 
-- [ ] READMEへ開発方法と制作ルールを記載した
-- [ ] lint、Stylelint、buildを実行した
-- [ ] 複数の画面幅で確認した
-- [ ] マウスを使わず主要機能を操作した
-- [ ] 一つの変更を一つの説明可能なcommitにした
-- [ ] Pull Requestへ目的と確認方法を書いた
-- [ ] 別の制作者が引き継げる状態になった
+- [ ] Swiperをインストールした
+- [ ] HeroをClient Componentにした理由を説明できる
+- [ ] 画像配列からスライドを生成した
+- [ ] 最初の画像だけをpreloadした
+- [ ] 自動再生をボタンで停止・再開できる
+- [ ] 動きを減らすOS設定では最初に停止する
+- [ ] A11yモジュールを追加した
+- [ ] HeroのスタイルをCSS Moduleへ置いた
+- [ ] ライブラリと自作部分の責務を区別できる
 
 ## Git
 
 ```bash
 git add .
-git commit -m "Document team workflow and quality checks"
+git commit -m "Add controllable hero slider with Swiper"
 ```

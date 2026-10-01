@@ -1,446 +1,276 @@
-# 第12章　SwiperでHeroスライドを作る
+# 第11章　スクロールに合わせて要素を表示する
 
 ## 目的
 
-複数のHero画像を一定時間ごとに切り替えるスライドを、Swiperで実装します。
-
-この章では、ライブラリへ任せる部分と、自分たちで管理する部分を分けます。
+元サイトの`IntersectionObserver`を、対象ごとに再利用できる`ScrollReveal`コンポーネントへ変更します。
 
 ```text
-Swiperへ任せる
-→ スライド移動、タッチ操作、ループ、自動再生
-
-自分たちで管理する
-→ 画像データ、見た目、再生・停止ボタン、利用者への配慮
-```
-
----
-
-## 1. ライブラリを使う理由
-
-スライドを一から作る場合、次の処理が必要です。
-
-- 現在の画像を管理する
-- 一定時間で次へ移動する
-- 最後から最初へ戻る
-- タッチ操作へ対応する
-- アニメーションを管理する
-- キーボードや支援技術へ対応する
-
-一般的なUIは、実績のあるライブラリを利用する選択肢があります。ただし、導入しただけでアクセシビリティやデザインが完成するわけではありません。
-
----
-
-## 2. Swiperをインストールする
-
-```bash
-npm install swiper
-```
-
-インストール後、`package.json`へSwiperが追加されたことを確認します。
-
----
-
-## 3. Heroのファイルを作る
-
-```text
-src/components/contents/
-├── Hero.jsx
-└── Hero.module.scss
-```
-
-Swiperはブラウザ上で動くため、HeroをClient Componentにします。
-
-```jsx
-"use client";
-
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { A11y, Autoplay } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-
-import "swiper/css";
-import "swiper/css/a11y";
-
-import styles from "./Hero.module.scss";
-```
-
-```text
-Swiper
-→ スライド全体
-
-SwiperSlide
-→ 一枚ずつのスライド
-
-Autoplay
-→ 自動再生
-
-A11y
-→ スライドの状態を支援技術へ伝える補助
-```
-
----
-
-## 4. 画像を配列にする
-
-画像を`public/pict`へ置きます。
-
-```text
-public/pict/
-├── hero01.avif
-├── hero02.avif
-└── hero03.avif
-```
-
-画像情報を配列にします。
-
-```jsx
-const heroImages = [
-  { src: "/pict/hero01.avif", alt: "" },
-  { src: "/pict/hero02.avif", alt: "" },
-  { src: "/pict/hero03.avif", alt: "" },
-];
-```
-
-背景演出として使い、画像内の情報をキャッチコピーでも伝えているため、ここでは`alt`を空にしています。画像自体に重要な情報がある場合は、その内容を`alt`へ書きます。
-
----
-
-## 5. mapでスライドを作る
-
-```jsx
-{heroImages.map((image, index) => (
-  <SwiperSlide key={image.src}>
-    <div className={styles.image}>
-      <Image
-        src={image.src}
-        alt={image.alt}
-        fill
-        sizes="100vw"
-        preload={index === 0}
-      />
-    </div>
-  </SwiperSlide>
-))}
-```
-
-4枚目を追加するときは、JSXを複製せず配列へ一件追加します。
-
-```text
-画像データを追加
+IntersectionObserver
 ↓
-map()がSwiperSlideを追加
+要素が表示範囲へ入る
+↓
+stateを更新する
+↓
+CSS Moduleのクラスが変わる
+↓
+transitionが動く
 ```
 
-第6章の作品カードと同じ考え方です。
+第8章で学んだ`useEffect`、cleanup、`useRef`の復習でもあります。
 
 ---
 
-## 6. 自動再生を止められるようにする
+## 1. 元の実装との違い
 
-自動で動き続ける表示には、一時停止できるボタンを用意します。
+元のJavaScriptでは、`querySelectorAll()`でページ全体から対象を探していました。
 
-Swiper本体をstateへ保存します。
+Reactでは、ScrollReveal自身が担当する一つの要素を`ref`で参照します。
 
-```jsx
-const [swiper, setSwiper] = useState(null);
-const [isPlaying, setIsPlaying] = useState(true);
+```text
+ページ全体から対象を探す
+→ しない
+
+コンポーネントが自分の要素をrefで参照する
+→ 今回の方法
 ```
-
-再生・停止を切り替えます。
-
-```jsx
-const toggleAutoplay = () => {
-  if (!swiper) return;
-
-  if (swiper.autoplay.running) {
-    swiper.autoplay.stop();
-    setIsPlaying(false);
-  } else {
-    swiper.autoplay.start();
-    setIsPlaying(true);
-  }
-};
-```
-
-動きを減らすOS設定の場合は、最初の自動再生を止めます。
-
-```jsx
-useEffect(() => {
-  if (!swiper) return;
-
-  const mediaQuery = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  );
-
-  const stopWhenReduced = () => {
-    if (mediaQuery.matches) {
-      swiper.autoplay.stop();
-      setIsPlaying(false);
-    }
-  };
-
-  stopWhenReduced();
-  mediaQuery.addEventListener("change", stopWhenReduced);
-
-  return () => {
-    mediaQuery.removeEventListener("change", stopWhenReduced);
-  };
-}, [swiper]);
-```
-
-OS設定によって停止した後でも、利用者が再生ボタンを押せば自分の意思で再開できます。
 
 ---
 
-## 7. Heroの完成コード
+## 2. ファイルを作る
+
+```text
+src/components/ui/ScrollReveal/
+├── index.jsx
+└── ScrollReveal.module.scss
+```
+
+---
+
+## 3. ScrollRevealを作る
 
 ```jsx
-// src/components/contents/Hero.jsx
+// src/components/ui/ScrollReveal/index.jsx
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { A11y, Autoplay } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
+import { useEffect, useRef, useState } from "react";
 
-import "swiper/css";
-import "swiper/css/a11y";
+import styles from "./ScrollReveal.module.scss";
 
-import styles from "./Hero.module.scss";
+const directionClasses = {
+  up: styles.up,
+  down: styles.down,
+  left: styles.left,
+  right: styles.right,
+};
 
-const heroImages = [
-  { src: "/pict/hero01.avif", alt: "" },
-  { src: "/pict/hero02.avif", alt: "" },
-  { src: "/pict/hero03.avif", alt: "" },
-];
-
-export default function Hero() {
-  const [swiper, setSwiper] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(true);
+export default function ScrollReveal({
+  children,
+  direction = "up",
+  delay = 0,
+  once = true,
+  className = "",
+}) {
+  const elementRef = useRef(null);
+  const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
-    if (!swiper) return;
+    const element = elementRef.current;
+    if (!element) return;
 
-    const mediaQuery = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+
+          if (once) {
+            observer.unobserve(entry.target);
+          }
+        } else if (!once) {
+          setIsInView(false);
+        }
+      },
+      {
+        root: null,
+        rootMargin: "0px 0px -10%",
+        threshold: 0.1,
+      },
     );
 
-    const stopWhenReduced = () => {
-      if (mediaQuery.matches) {
-        swiper.autoplay.stop();
-        setIsPlaying(false);
-      }
-    };
-
-    stopWhenReduced();
-    mediaQuery.addEventListener("change", stopWhenReduced);
+    observer.observe(element);
 
     return () => {
-      mediaQuery.removeEventListener("change", stopWhenReduced);
+      observer.disconnect();
     };
-  }, [swiper]);
+  }, [once]);
 
-  const toggleAutoplay = () => {
-    if (!swiper) return;
-
-    if (swiper.autoplay.running) {
-      swiper.autoplay.stop();
-      setIsPlaying(false);
-    } else {
-      swiper.autoplay.start();
-      setIsPlaying(true);
-    }
-  };
+  const classes = [
+    styles.reveal,
+    directionClasses[direction] ?? directionClasses.up,
+    isInView ? styles.inView : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <section className={styles.hero} aria-labelledby="hero-title">
-      <Swiper
-        className={styles.slider}
-        modules={[Autoplay, A11y]}
-        loop
-        autoplay={{
-          delay: 5000,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: true,
-        }}
-        a11y={{
-          enabled: true,
-          containerMessage: "Drama Archive メインビジュアル",
-        }}
-        onSwiper={setSwiper}
-        onAutoplayStart={() => setIsPlaying(true)}
-        onAutoplayStop={() => setIsPlaying(false)}
-      >
-        {heroImages.map((image, index) => (
-          <SwiperSlide key={image.src}>
-            <div className={styles.image}>
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                sizes="100vw"
-                preload={index === 0}
-              />
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-
-      <div className={styles.copy}>
-        <h1 id="hero-title">Drama Archive</h1>
-        <p>Stories that stay with us.</p>
-      </div>
-
-      <button
-        type="button"
-        className={styles.autoplayButton}
-        onClick={toggleAutoplay}
-        disabled={!swiper}
-      >
-        {isPlaying ? "スライドを一時停止" : "スライドを再生"}
-      </button>
-    </section>
+    <div
+      ref={elementRef}
+      className={classes}
+      style={{ "--reveal-delay": `${delay}ms` }}
+    >
+      {children}
+    </div>
   );
 }
 ```
 
-ボタンの文字も現在の状態に合わせて変えるため、次に実行できる操作が分かります。
+`directionClasses`によって、外から受け取った`up`などの値をCSS Modulesのクラスへ対応させています。
 
 ---
 
-## 8. HeroのSCSS
+## 4. SCSSを作る
 
 ```scss
-// src/components/contents/Hero.module.scss
-@use "@/styles/shared" as shared;
-
-.hero {
-  position: relative;
-  width: 100%;
-  height: 70svh;
-  min-height: 500px;
-  overflow: hidden;
+// src/components/ui/ScrollReveal/ScrollReveal.module.scss
+.reveal {
+  opacity: 0;
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
 }
 
-.slider,
-.image {
-  width: 100%;
-  height: 100%;
+.up {
+  transform: translateY(24px);
 }
 
-.image {
-  position: relative;
-
-  img {
-    object-fit: cover;
-  }
+.down {
+  transform: translateY(-24px);
 }
 
-.copy {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  left: 50%;
-  width: calc(100% - 40px);
-  text-align: center;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
+.left {
+  transform: translateX(40px);
 }
 
-.autoplayButton {
-  position: absolute;
-  z-index: 3;
-  right: 20px;
-  bottom: 20px;
-  min-height: 44px;
-  padding: 8px 16px;
-  border: 1px solid currentcolor;
-  color: shared.$color-text;
-  background: rgb(0 0 0 / 70%);
-  cursor: pointer;
+.right {
+  transform: translateX(-40px);
 }
 
-.autoplayButton:focus-visible {
-  outline: 3px solid shared.$color-accent;
-  outline-offset: 3px;
+.inView {
+  opacity: 1;
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .slider * {
-    transition-duration: 0.01ms !important;
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 ```
 
-キャッチコピーはSwiperの外側に置いているため、画像が変わっても同じ位置に残ります。
+動きを減らすOS設定を利用している場合は、アニメーションなしで最初から表示します。
 
 ---
 
-## 9. page.jsへ配置する
+## 5. DramaListへ適用する
+
+`DramaList.jsx`で読み込みます。
 
 ```jsx
-// src/app/page.js
-import Hero from "@/components/contents/Hero";
-import DramaArchive from "@/components/contents/DramaArchive";
-import styles from "./page.module.scss";
+import ScrollReveal from "@/components/ui/ScrollReveal";
+```
 
-export default function Home() {
-  return (
-    <main>
-      <Hero />
+`map()`の中を次のように変更します。
 
-      <div className={styles.main}>
-        <DramaArchive />
-      </div>
-    </main>
-  );
+```jsx
+{dramas.map((drama, index) => (
+  <ScrollReveal
+    key={drama.id}
+    direction="up"
+    delay={(index % 3) * 100}
+    className={styles.item}
+  >
+    <DramaCard
+      drama={drama}
+      number={index + 1}
+      onSelect={onSelect}
+    />
+  </ScrollReveal>
+))}
+```
+
+`key`は、`map()`が直接返す一番外側のScrollRevealへ移します。
+
+`DramaList.module.scss`へ追加します。
+
+```scss
+.item {
+  min-width: 0;
 }
 ```
 
-Heroは画面幅いっぱい、DramaArchiveは第4章で決めたコンテンツ幅に収めています。
+---
+
+## 6. delayを増やし続けない
+
+次の書き方では、作品数が多いほど待ち時間が増えます。
+
+```jsx
+delay={index * 100}
+```
+
+今回は3列の表示を想定し、列ごとに遅延を戻します。
+
+```jsx
+delay={(index % 3) * 100}
+```
+
+```text
+1列目 → 0ms
+2列目 → 100ms
+3列目 → 200ms
+4列目 → 0ms
+```
+
+演出のために、後ろの情報が長時間読めなくなる状態を避けます。
 
 ---
 
-## 10. ライブラリの境界を確認する
-
-Swiperへ渡している主な設定は次のとおりです。
+## 7. Effectとcleanupを確認する
 
 ```text
-modules
-→ 使う機能
+コンポーネントを表示
+↓
+observer.observe(element)
 
-loop
-→ 最後から最初へ戻る
-
-autoplay
-→ 自動再生の間隔と動作
-
-onSwiper
-→ 作成されたSwiper本体を受け取る
+コンポーネントを外す
+↓
+observer.disconnect()
 ```
 
-一方、画像配列、キャッチコピー、停止ボタン、SCSSは自分たちの責務です。
+Modalではイベント監視を解除しました。ScrollRevealではObserverを解除します。
 
-パッケージを導入したときは、`package.json`と`package-lock.json`もGitへ記録します。将来更新するときは、表示と操作を確認してからバージョンを上げます。
+対象は違いますが、外部の仕組みと同期し、最後に片付ける考え方は同じです。
 
 ---
 
 ## 今日の確認
 
-- [ ] Swiperをインストールした
-- [ ] HeroをClient Componentにした理由を説明できる
-- [ ] 画像配列からスライドを生成した
-- [ ] 最初の画像だけをpreloadした
-- [ ] 自動再生をボタンで停止・再開できる
-- [ ] 動きを減らすOS設定では最初に停止する
-- [ ] A11yモジュールを追加した
-- [ ] HeroのスタイルをCSS Moduleへ置いた
-- [ ] ライブラリと自作部分の責務を区別できる
+- [ ] ScrollRevealが自分の要素をrefで参照している
+- [ ] 要素が表示範囲へ入るとstateが変わる
+- [ ] CSS Modulesのクラスによって表示が変わる
+- [ ] 一度表示した要素を監視から外した
+- [ ] コンポーネント終了時にObserverを解除した
+- [ ] `key`をmap直下の要素へ付けた
+- [ ] `prefers-reduced-motion`へ対応した
+- [ ] 遅延が増え続けないことを確認した
 
 ## Git
 
 ```bash
 git add .
-git commit -m "Add controllable hero slider with Swiper"
+git commit -m "Add reusable scroll reveal animation"
 ```

@@ -1,4 +1,4 @@
-// @/components/contents/DramaList.module.scss
+// @/components/contents/DramaList/DramaList.module.scss
 
 @use "@/styles/shared" as *;
 
@@ -38,4 +38,10 @@
       }
     }
   }
+}
+
+.resultComment {
+  @include tume;
+  margin-bottom: 1rem;
+  text-align: center;
 }

@@ -11,6 +11,10 @@
   font-size: 93.75%; // 15px ÷ 16px ＝ 0.9375 15px = 1remとなる
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: #fff9ee;
   color: #000000;
