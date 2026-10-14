@@ -1,135 +1,64 @@
-# 第14章　GitHub Pagesへ公開する
+# 第13章　チームで確認できる制作基準を作る
 
 ## 目的
 
-完成したNext.jsサイトを静的ファイルとして書き出し、GitHub Pagesへ自動公開します。
+完成したサイトを「自分のPCでは動く」状態から、別の制作者が確認・修正・引き継ぎできる状態へ進めます。
 
-```text
-自分のPCで変更
-↓
-GitHubへpush
-↓
-GitHub Actionsがbuild
-↓
-GitHub Pagesへ公開
-```
-
-公開後も、同じ流れで更新できます。
+チーム制作では、コードの書き方だけでなく、変更理由と確認方法を共有することが重要です。
 
 ---
 
-## 1. 公開URLとbasePath
-
-GitHubのリポジトリ名が`drama_archive`の場合、公開URLは次の形になります。
-
-```text
-https://GitHubユーザー名.github.io/drama_archive/
-```
-
-このURLでは、サイトが`/`ではなく`/drama_archive`の下にあります。この部分を`basePath`としてNext.jsへ伝えます。
-
-リポジトリ名が違う場合は、以下の`drama_archive`を実際の名前へ置き換えてください。
-
----
-
-## 2. next.config.mjsを設定する
-
-```js
-// next.config.mjs
-const repositoryName = "drama_archive";
-const isProduction = process.env.NODE_ENV === "production";
-const basePath = isProduction ? `/${repositoryName}` : "";
-
-const nextConfig = {
-  output: "export",
-  basePath,
-  images: {
-    unoptimized: true,
-  },
-  env: {
-    NEXT_PUBLIC_BASE_PATH: basePath,
-  },
-};
-
-export default nextConfig;
-```
-
-```text
-output: "export"
-→ HTML、CSS、JavaScriptとして書き出す
-
-basePath
-→ GitHub Pages上のリポジトリ名を含むURLへ対応する
-
-images.unoptimized
-→ 画像最適化サーバーを使わず静的出力できるようにする
-```
-
-開発中は`basePath`が空なので、これまでどおり`http://localhost:3000`で確認できます。
-
----
-
-## 3. public画像のパスを揃える
-
-`basePath`を設定しても、通常の`/pict/...`という文字列へリポジトリ名が自動追加されるわけではありません。
-
-画像パスを作る小さな関数を用意します。
+## 1. 現在のファイル構成を確認する
 
 ```text
 src/
-└── lib/
-    └── assetPath.js
+├── app/
+│   ├── globals.scss
+│   ├── layout.js
+│   ├── page.js
+│   └── page.module.scss
+├── components/
+│   ├── layout/
+│   │   ├── Header/
+│   │   ├── Footer/
+│   │   └── MobileMenu/
+│   ├── contents/
+│   │   ├── Hero.jsx
+│   │   ├── DramaArchive.jsx
+│   │   ├── FeaturedDrama.jsx
+│   │   ├── DramaControls.jsx
+│   │   ├── DramaList.jsx
+│   │   ├── DramaCard.jsx
+│   │   ├── DramaDetail.jsx
+│   │   └── 各コンポーネントの.module.scss
+│   └── ui/
+│       ├── Modal/
+│       └── ScrollReveal/
+├── data/
+│   └── dramas.js
+└── styles/
+    ├── _base.scss
+    ├── reset.css
+    └── shared/
 ```
 
-```js
-// src/lib/assetPath.js
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
-export function assetPath(path) {
-  return `${basePath}${path}`;
-}
-```
-
-作品データでは次のように使います。
-
-```js
-// src/data/dramas.js
-import { assetPath } from "@/lib/assetPath";
-
-export const dramas = [
-  {
-    id: "true-detective",
-    image: assetPath("/pict/truedetective.avif"),
-    // ほかのデータ
-  },
-];
-```
-
-Heroでも使います。
-
-```jsx
-import { assetPath } from "@/lib/assetPath";
-
-const heroImages = [
-  { src: assetPath("/pict/hero01.avif"), alt: "" },
-  { src: assetPath("/pict/hero02.avif"), alt: "" },
-  { src: assetPath("/pict/hero03.avif"), alt: "" },
-];
-```
-
-Headerのロゴも変更します。
-
-```jsx
-<img src={assetPath("/pict/logo.svg")} alt="" />
-```
-
-`public`内を参照しているほかの画像やファイルも、同じ方法へ揃えます。
-
-外部URLや`#featured`のようなページ内リンクには`assetPath()`を使いません。
+各フォルダの責務を説明できないファイルがあれば、置き場所を見直します。
 
 ---
 
-## 4. ローカルで公開用buildを確認する
+## 2. READMEへ制作ルールを書く
+
+READMEへ、少なくとも次を追加します。
+
+````md
+## 開発方法
+
+```bash
+npm install
+npm run dev
+```
+
+## 確認コマンド
 
 ```bash
 npm run lint
@@ -137,181 +66,208 @@ npm run lint:styles
 npm run build
 ```
 
-成功すると、プロジェクト直下へ`out`フォルダが作成されます。
+## ファイルの役割
 
-```text
-drama_archive/
-└── out/
-    ├── index.html
-    ├── _next/
-    └── pict/
-```
+- `app`: ページ、layout、全体スタイル
+- `components/layout`: 全ページ共通の構造
+- `components/contents`: Drama Archive固有の表示
+- `components/ui`: 内容に依存しない再利用UI
+- `data`: 表示する内容
+- `styles/shared`: 複数のSCSSから使う値とmixin
 
-`out`はbuildのたびに作り直せるため、Gitへ登録しません。`.gitignore`へ次があることを確認します。
+## スタイルルール
 
-```text
-/out/
-```
+- サイト全体の指定だけをglobalへ置く
+- コンポーネント固有の指定はCSS Modulesへ置く
+- CSS Modulesのクラス名はcamelCaseにする
+- 色、ブレークポイント、z-indexは共有値を確認する
+- 新しい共通値は、二か所以上で必要になってから追加を検討する
+````
 
----
-
-## 5. GitHub Actionsを作る
-
-次のファイルを作ります。
-
-```text
-.github/
-└── workflows/
-    └── deploy.yml
-```
-
-```yaml
-# .github/workflows/deploy.yml
-name: Deploy Next.js site to Pages
-
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./out
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-```
-
-`main`へpushされたとき、依存関係のインストール、build、公開が自動で行われます。
+READMEは完成報告ではなく、次の人が作業を始めるための入口です。
 
 ---
 
-## 6. GitHub Pagesを有効にする
-
-GitHubのリポジトリを開きます。
-
-```text
-Settings
-↓
-Pages
-↓
-Build and deployment
-↓
-Source: GitHub Actions
-```
-
-設定後、変更をGitへ記録します。
+## 3. 自動確認を実行する
 
 ```bash
-git add .
-git commit -m "Configure GitHub Pages deployment"
-git push
+npm run lint
+npm run lint:styles
+npm run build
 ```
 
-GitHubの`Actions`タブで処理を確認します。緑色のチェックが付いたら、Pagesに表示されたURLを開きます。
-
----
-
-## 7. 公開後に確認する
-
-ローカルで動いていても、公開先のパスや大文字・小文字の違いで問題が出る場合があります。
-
-次を確認してください。
-
-- トップページが表示される
-- ロゴ、Hero、作品画像が表示される
-- CSSが適用されている
-- PC・モバイルメニューが動く
-- 作品Modalを開閉できる
-- 絞り込みと並べ替えが動く
-- ScrollRevealとSwiperが動く
-- スライドを停止できる
-- ブラウザを再読み込みしても表示される
-- コンソールにエラーが出ていない
-
-問題がある場合は、GitHub Actionsのログから最初のエラーを確認します。一度に複数箇所を変更せず、一つずつ原因を切り分けます。
-
----
-
-## 8. 更新の流れ
-
-公開後の更新も同じです。
+役割は次のとおりです。
 
 ```text
-作業用branchを作る
-↓
-修正する
-↓
-lint・Stylelint・build
-↓
-Pull Requestで確認する
-↓
-mainへ統合する
-↓
-GitHub Pagesが自動更新される
+lint
+→ JavaScript・JSXの問題を確認
+
+lint:styles
+→ CSS・SCSSの問題を確認
+
+build
+→ 公開用データを最後まで作れるか確認
 ```
 
-作品を追加する場合は、基本的に`src/data/dramas.js`と画像を変更します。カードやModalのJSXを複製する必要はありません。
+警告を数だけ減らすのではなく、メッセージを読み、どの制作ルールに反しているか確認します。
 
-これで、データから表示を作り、共通部品と制作ルールを使い、チームで確認して公開するところまでつながりました。
+---
+
+## 4. ブラウザで確認する
+
+自動確認だけでは、見た目と操作のすべては確認できません。
+
+### 画面幅
+
+- 375px前後のスマートフォン
+- 768px前後のタブレット
+- 1280px以上のPC
+
+### キーボード
+
+- Tabの順番が自然か
+- フォーカス位置が見えるか
+- MenuをEnterで開けるか
+- ModalをEscapeで閉じられるか
+- Modalを閉じると元の要素へ戻るか
+- スライドを停止できるか
+
+### 内容
+
+- 画像が欠けていないか
+- 見出しの順番が自然か
+- 絞り込みが0件のとき説明が出るか
+- 作品を追加しても表示が壊れないか
+- 長いタイトルやレビューでも崩れないか
+
+### 動き
+
+- `prefers-reduced-motion`で過度に動かないか
+- ScrollRevealのために情報が長時間隠れないか
+- Swiperを停止・再開できるか
+
+---
+
+## 5. 変更を小さく分ける
+
+一つのcommitには、一つの説明可能な変更を入れます。
+
+```text
+良い例
+Add genre filter to drama list
+
+分かりにくい例
+fix various things
+```
+
+スタイル整理、機能追加、文章変更を一つのcommitへ混ぜないようにすると、レビューと修正の取り消しがしやすくなります。
+
+---
+
+## 6. Pull Requestで共有する
+
+チームで作業する場合は、作業用branchを作ります。
+
+```bash
+git switch -c feature/drama-filter
+```
+
+変更をcommitしてGitHubへ送ります。
+
+```bash
+git push -u origin feature/drama-filter
+```
+
+GitHubでPull Requestを作り、次を記載します。
+
+```md
+## 目的
+
+何を解決する変更か
+
+## 主な変更
+
+- 変更点1
+- 変更点2
+
+## 確認方法
+
+1. 確認手順1
+2. 確認手順2
+
+## 確認結果
+
+- [ ] npm run lint
+- [ ] npm run lint:styles
+- [ ] npm run build
+- [ ] スマートフォン表示
+- [ ] PC表示
+- [ ] キーボード操作
+```
+
+レビューする側がコードを推測しなくても、目的と確認方法が分かる状態を目指します。
+
+---
+
+## 7. コンポーネントをレビューする観点
+
+### 責務
+
+- 一つのコンポーネントが多くの役割を持ちすぎていないか
+- 表示だけの子が不要なstateを持っていないか
+- 共通UIに作品固有の処理が入っていないか
+
+### データ
+
+- 同じ内容を複数ファイルへ直接書いていないか
+- 安定したIDをkeyに使っているか
+- 元配列を直接変更していないか
+- 計算できる値を重複したstateにしていないか
+
+### スタイル
+
+- コンポーネント固有スタイルがglobalへ漏れていないか
+- 共有値を理由なく重複定義していないか
+- クラス名から役割を判断できるか
+- フォーカス表示を消していないか
+
+### Next.js・React
+
+- 操作が不要なコンポーネントまでClient Componentにしていないか
+- Effectにcleanupが必要ではないか
+- ブラウザAPIをServer Componentで使っていないか
+
+---
+
+## 8. 完成の基準
+
+次のすべてを満たしたら、公開へ進みます。
+
+- 必要な画面と機能が揃っている
+- 元サイトの内容が失われていない
+- データ追加だけで一覧へ反映される
+- PCとモバイルのナビ情報が共通化されている
+- Modalをマウスとキーボードで操作できる
+- 自動再生を止められる
+- lint、Stylelint、buildが成功する
+- READMEだけで別の制作者が開発を始められる
+- Pull Requestに目的と確認方法が書かれている
 
 ---
 
 ## 今日の確認
 
-- [ ] `output: "export"`を設定した
-- [ ] 公開URLに合う`basePath`を設定した
-- [ ] public画像へ`assetPath()`を使用した
-- [ ] ローカルでbuildが成功した
-- [ ] GitHub Actionsの公開処理が成功した
-- [ ] 公開URLですべての画像とスタイルを確認した
-- [ ] 公開後も主要な操作を確認した
-- [ ] mainへの統合で自動更新される流れを説明できる
+- [ ] READMEへ開発方法と制作ルールを記載した
+- [ ] lint、Stylelint、buildを実行した
+- [ ] 複数の画面幅で確認した
+- [ ] マウスを使わず主要機能を操作した
+- [ ] 一つの変更を一つの説明可能なcommitにした
+- [ ] Pull Requestへ目的と確認方法を書いた
+- [ ] 別の制作者が引き継げる状態になった
 
 ## Git
 
 ```bash
 git add .
-git commit -m "Publish Drama Archive with GitHub Pages"
-git push
+git commit -m "Document team workflow and quality checks"
 ```

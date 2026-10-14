@@ -738,7 +738,7 @@ $ npm install react-markdown
 `react-markdown` をインストール。レビュー本文はMarkdownで書きます。リンクは次のように記述します。
 
 ```md
-[［Antibody］（https://antibody.tv/）](https://antibody.tv/)
+[Antibody(https://antibody.tv/)](https://antibody.tv/)
 ```
 
 JSXでは、`ReactMarkdown`を使ってレビューを表示します。

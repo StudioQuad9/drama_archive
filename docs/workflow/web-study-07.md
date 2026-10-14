@@ -360,13 +360,13 @@ falseへ変更
 メニューボタンの`onClick`へ、作成した関数を渡します。
 
 ```jsx
-<button
+<button 
   type="button"
   className={styles.menuButton}
   onClick={toggleMenu}
 >
   <span className="material-symbols-outlined">
-    menu
+    { isMenuOpen ? "close" : "open" }
   </span>
 </button>
 ```
@@ -385,10 +385,220 @@ onClick={toggleMenu()}
 
 こちらは表示処理中に関数を実行してしまうため、今回の指定には使いません。
 
-ボタンを押すたびに、画面の文字が「開いている」「閉じている」と変わることを確認します。
+ボタンを押すたびに、表示が切り替わることを確認します。
 
 ---
 
+## 8. 旧HTMLの開閉方法をReact用に変更する
+
+旧HTML版では、スマートフォン用メニューを次の二つのクラスで開閉していました。
+
+```scss
+.menu {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-50%);
+}
+
+.menu.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+```
+
+JavaScriptから`active`クラスを追加・削除することで、表示状態を変更していました。
+
+```text
+.menu
+→ 閉じている
+
+.menu.active
+→ 開いている
+```
+
+React版では、この`active`クラスを使いません。
+
+今回は、`isMenuOpen`の値から`hidden`属性を決めます。
+
+```jsx
+<nav
+  id="mobile-navigation"
+  className={styles.menu}
+  aria-label="モバイルナビゲーション"
+  hidden={!isMenuOpen}
+>
+  {/* navigationLinksから作ったul */}
+</nav>
+```
+
+そのため、旧HTML版の次の指定は削除します。
+
+```scss
+.menu {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-50%);
+  transition: 0.5s;
+}
+```
+
+また、`_base.scss`に残っている次の`.menu.active`も使用しません。
+
+```scss
+.modal.active,
+.menu.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+```
+
+Modal用の指定は残すため、次のように分けます。
+
+```scss
+.modal.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+```
+
+### Header.module.scssをReact版へ変更する
+
+この段階では、`.menu`には開いているときのレイアウトと見た目だけを書きます。
+
+```scss
+// @/components/Header/Header.module.scss
+
+@use "@/styles/shared" as *;
+
+.navigation {
+  align-items: center;
+}
+
+.menuButton {
+  margin-left: auto;
+  font-size: 32px;
+  color: #000000;
+
+  @include mq(md) {
+    display: none;
+  }
+}
+
+.menu {
+  display: grid;
+  position: fixed;
+  inset: 60px 0 0;
+  place-items: center;
+  background: rgb(var(--modal-color) / 0.8);
+  z-index: 1000;
+
+  &[hidden] {
+    display: none;
+  }
+
+  @include mq(md) {
+    display: none;
+  }
+
+  & > ul {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  & li {
+    margin-top: 30px;
+    padding: 10px;
+    font-size: 1.5rem;
+  }
+
+  & a {
+    color: #ffffff;
+  }
+}
+
+.pcMenu {
+  display: none;
+
+  @include mq(md) {
+    display: block;
+    margin-left: auto;
+  }
+
+  & > ul {
+    align-items: center;
+  }
+
+  & li {
+    padding: 10px;
+    font-size: 1.1rem;
+  }
+
+  & a:hover {
+    background: rgb(var(--accent));
+  }
+}
+```
+
+今回の役割分担は、次のとおりです。
+
+```text
+isMenuOpen
+→ 現在開いているかを持つ
+
+hidden
+→ 表示するか、隠すかを決める
+
+SCSS
+→ 表示されたメニューの位置や色を決める
+```
+
+`hidden`には、非表示にする場合に`true`を渡します。
+
+```text
+isMenuOpenがfalse
+↓
+!isMenuOpenはtrue
+↓
+hidden={true}
+↓
+メニューを隠す
+```
+
+```text
+isMenuOpenがtrue
+↓
+!isMenuOpenはfalse
+↓
+hidden={false}
+↓
+メニューを表示する
+```
+
+動作全体は次のようになります。
+
+```text
+ボタンを押す
+↓
+toggleMenu()を実行する
+↓
+isMenuOpenが変わる
+↓
+hiddenの値が変わる
+↓
+Reactが表示を更新する
+```
+
+旧HTML版のように、JavaScriptからDOMのクラスを直接追加・削除しているのではありません。
+
+**stateを変更し、そのstateから表示を決めています。**
+
+この章では、まず開閉の仕組みを理解することを優先するため、メニューの開閉アニメーションは付けません。
+
+`hidden`を使うと表示と非表示が即座に切り替わります。アニメーションを付ける場合は、後から`data-state`や開閉用クラスを使う方法を別に検討します。
+<!-- 
 ## 8. stateをメニューの表示へ接続する
 
 stateが切り替わることを確認できたら、スマートフォン用ナビゲーションへ接続します。
@@ -444,7 +654,7 @@ Reactが表示を更新する
 
 JavaScriptからDOMのクラスを直接追加・削除しているのではありません。
 
-**stateを変更し、そのstateから表示を決めています。**
+**stateを変更し、そのstateから表示を決めています。** -->
 
 ---
 
