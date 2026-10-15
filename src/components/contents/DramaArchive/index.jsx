@@ -2,10 +2,10 @@
 
 import FeaturedDrama from "@/components/contents/FeaturedDrama";
 import DramaList from "@/components/contents/DramaList";
-import { dramas } from "@/data/dramas"
+import { dramas } from "@/data/dramas";
 
 export default function DramaArchive() {
-  const featuredDrama= dramas.find((drama) => {
+  const featuredDrama = dramas.find((drama) => {
     return drama.featured;
   });
 
