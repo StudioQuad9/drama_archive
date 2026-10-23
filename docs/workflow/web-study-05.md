@@ -120,6 +120,19 @@ review: [],
 id: "true-detective"
 ```
 
+```jsx
+const arr = [1, 2, 3, 4, 5];
+
+{
+  arr.map((a) => {
+    return (
+      <p key={a}>
+        {a}
+      </p>
+    );
+  })
+}
+```
 ---
 
 ## 4. 段落を配列にする理由

@@ -157,6 +157,8 @@ PCとスマートフォンの見た目
 ```
 
 `navigationLinks`はHeaderだけで使う固定データなので、コンポーネントの外側へ置きます。
+なぜなら、コンポーネントの中はStateが変わるたびにHeaderコンポーネントは再実行される。
+その度に、配列を読み込み直す必要がないからです。
 
 ```jsx
 import Image from "next/image";
@@ -255,9 +257,11 @@ PC用とスマートフォン用の両方に`Contact`が追加されれば成功
 
 ここまでは、データから静的な表示を作りました。
 
-ここからは、ボタンを押した結果によって表示を変えます。
+ここからは、スマホ表示で右上端にある、モーダル開閉ボタンを押した結果によって表示を変えることをやっていきます。
 
-Headerファイルの先頭へ`"use client"`を追加し、Reactから`useState`を読み込みます。
+Headerファイルの先頭へ`"use client"`を追加してください。
+
+そして、Reactから`useState`を読み込みます。
 
 ```jsx
 "use client";
@@ -268,17 +272,53 @@ import Image from "next/image";
 import styles from "./Header.module.scss";
 ```
 
-`useState`はブラウザ上の操作によって変わる値を扱います。そのため、このHeaderはClient Componentになります。
+この`"use client"` とは？　なぜ要るのか？
 
-`"use client"`は、サイト全体をClient Componentにする指定ではありません。
+これから実装していくコードの流れで説明します。
 
-```text
-Header
-→ ボタン操作とstateを扱うClient Component
-
-DramaArchive
-→ 操作を持たないためServer Componentのまま
 ```
+ブラウザ
+→「ボタンがクリックされた」とReactへ知らせる
+
+React
+→ onClick属性へ渡されたtoggleMenu関数を実行する
+
+toggleMenu
+→ setIsMenuOpen()関数を実行する
+
+React
+→ stateの真偽値を切り替える
+```
+
+`JavaScript`は、ブラウザが提供する`Web API`を利用できます。`React`も`JavaScript`によって作られているため、**ブラウザのイベント機能を利用**できます。
+
+この場合、`ブラウザ`がクリックを検知すると、`React`がその`クリックイベント`受け取って、`onClick属性`へ渡された**関数を実行**することができるのです。
+
+`React`はクリックされたときに`toggleMenu関数`を呼び出し、
+
+`setIsMenuOpen()関数`によって`state`の真偽値を変更します。
+
+この一連の処理は画面を表示したあとのブラウザ上で行われるため、`Headerコンポーネント`を**Client Component**として**宣言する必要**があります。
+
+これまでそんな宣言が必要なかったのは、
+開発環境で動かせていたからです。
+
+つまり、現在は、ローカルで開発しているPCがサーバーなわけです。
+
+```
+$ npm run dev
+
+> drama_archive@0.1.0 dev
+> next dev
+▲ Next.js 16.3.5 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.100.55:3000
+✓ Ready in 318ms
+✓ Running next.config.mjs took 10ms
+```
+
+今回は、`GitHub Pages`へ静的ファイルをデプロイしてWEBページを公開しますが、<br />
+通常は、開発したアプリを`Vercel`や`AWS`など`Next.js`の実行環境があるホスティングサービスにデプロイしてWEBページを公開します。
 
 ---
 
@@ -317,53 +357,61 @@ true
 この段階では、まだメニューの表示に接続しません。まずstateそのものを画面に出します。
 
 ```jsx
-<p>
+<button>
   現在の状態：
   {isMenuOpen ? "開いている" : "閉じている"}
-</p>
+</button>
 ```
 
 最初に「現在の状態：閉じている」と表示されることを確認してください。
-
-この`p`はstateを確認するための一時的な表示です。動作確認後に削除します。
 
 ---
 
 ## 7. ボタンでstateを変更する
 
-現在の状態を反転する関数を作ります。
+クリックしたら『閉じている』『開いている』が切り替わるボタンを作ります。
+
+`State`を定義した式の下に、ボタンをクリックしたら『閉じている』『開いている』を切り替える関数を`toggleMenu`とし、値は無名関数を定義します。
+
+`toggleMenu`関数が呼び出されると、更新用関数の引数に設置したコールバック関数が発動します。
+
+`prev`とは、Reactで慣習的な呼び名です。`previous value` 『直前の状態の値』という意味です。
+
+で、ここも不思議なんですが、更新用関数に設定するコールバック関数の引数には、State（状態）が変わる直前の値が入ることになっています。
+
+今は、デフォルトで設定した`false`が引数に入る。
+
+戻り値には、`false`の`！`否定なので、`true`が返ってくるという仕組みです。
+
+これは、状態を切り替える（トグルする）際に慣用的に使われるコードです。
 
 ```jsx
-const toggleMenu = () => {
-  setIsMenuOpen((current) => !current);
+const handleToggleMenu = () => {
+  setIsMenuOpen((prev) => !prev);
 };
 ```
 
-```text
-現在がfalse
-↓
-!false
-↓
-trueへ変更
+では先ほどのボタンに`handleToggleMenu`関数を仕込んでみます。
+
+ブラウザがクリックを検知すると、`React`は`handleToggleMenu`関数を呼び出し（発火するイメージ）
+、そして、関数を実行します。実行する中身は`State`（状態）を更新する関数を実行します。
+
+
+```jsx
+<button
+  onClick={handleToggleMenu}
+>
+  現在の状況: {isMenuOpen ? "開いている" : "閉じている"}
+</button>
 ```
 
-```text
-現在がtrue
-↓
-!true
-↓
-falseへ変更
-```
-
-`current`は、更新直前のstateです。
-
-メニューボタンの`onClick`へ、作成した関数を渡します。
+では、このボタンは削除して、本来のボタンに設置します。
 
 ```jsx
 <button 
   type="button"
   className={styles.menuButton}
-  onClick={toggleMenu}
+  onClick={handleToggleMenu}
 >
   <span className="material-symbols-outlined">
     { isMenuOpen ? "close" : "open" }
@@ -371,21 +419,27 @@ falseへ変更
 </button>
 ```
 
-ここで大切なのは、次の違いです。
+ここで留意すべき点は、
 
 ```jsx
 onClick={toggleMenu}
 ```
 
-これは、クリックされたときに呼び出す関数を渡しています。
+`onClick`属性の値は、クリックされたときに呼び出す関数を渡すことで、`React`は定義した関数を実行します。
 
 ```jsx
 onClick={toggleMenu()}
 ```
 
-こちらは表示処理中に関数を実行してしまうため、今回の指定には使いません。
+こちらは表示処理中に関数を実行してしまうため想定した動作をしないということです。
 
-ボタンを押すたびに、表示が切り替わることを確認します。
+ちなみに、`button`要素に属性を追加しています。
+
+`aria-expanded`は、メニューが現在開いているか閉じているかをスクリーンリーダーへ伝えます。`aria-controls`は、このボタンがどの要素を操作するのかを、対象のidによって伝えます。
+
+`mobile-navigation`は、このあと設定するnav要素のidとします。
+
+では、ボタンを押すたびに、表示が切り替わることを確認します。
 
 ---
 
@@ -397,7 +451,7 @@ onClick={toggleMenu()}
 .menu {
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-50%);
+  transform: translateY(-30px);
 }
 
 .menu.active {
@@ -419,13 +473,13 @@ JavaScriptから`active`クラスを追加・削除することで、表示状�
 
 React版では、この`active`クラスを使いません。
 
-今回は、`isMenuOpen`の値から`hidden`属性を決めます。
+今回は、`isMenuOpen`の値から`hidden`属性コントロールします。
 
 ```jsx
 <nav
   id="mobile-navigation"
   className={styles.menu}
-  aria-label="モバイルナビゲーション"
+  aria-label="モバイル・ナビゲーション"
   hidden={!isMenuOpen}
 >
   {/* navigationLinksから作ったul */}
@@ -438,7 +492,7 @@ React版では、この`active`クラスを使いません。
 .menu {
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-50%);
+  transform: translateY(-30px);
   transition: 0.5s;
 }
 ```
@@ -466,7 +520,7 @@ Modal用の指定は残すため、次のように分けます。
 
 ### Header.module.scssをReact版へ変更する
 
-この段階では、`.menu`には開いているときのレイアウトと見た目だけを書きます。
+では、`.menu`には開いているときのレイアウトと見た目だけを書きます。
 
 ```scss
 // @/components/Header/Header.module.scss
@@ -481,7 +535,6 @@ Modal用の指定は残すため、次のように分けます。
   margin-left: auto;
   font-size: 32px;
   color: #000000;
-
   @include mq(md) {
     display: none;
   }
@@ -494,26 +547,21 @@ Modal用の指定は残すため、次のように分けます。
   place-items: center;
   background: rgb(var(--modal-color) / 0.8);
   z-index: 1000;
-
   &[hidden] {
     display: none;
   }
-
   @include mq(md) {
     display: none;
   }
-
   & > ul {
     flex-direction: column;
     text-align: center;
   }
-
   & li {
     margin-top: 30px;
     padding: 10px;
     font-size: 1.5rem;
   }
-
   & a {
     color: #ffffff;
   }
@@ -521,21 +569,17 @@ Modal用の指定は残すため、次のように分けます。
 
 .pcMenu {
   display: none;
-
   @include mq(md) {
     display: block;
     margin-left: auto;
   }
-
   & > ul {
     align-items: center;
   }
-
   & li {
     padding: 10px;
     font-size: 1.1rem;
   }
-
   & a:hover {
     background: rgb(var(--accent));
   }
@@ -598,63 +642,6 @@ Reactが表示を更新する
 この章では、まず開閉の仕組みを理解することを優先するため、メニューの開閉アニメーションは付けません。
 
 `hidden`を使うと表示と非表示が即座に切り替わります。アニメーションを付ける場合は、後から`data-state`や開閉用クラスを使う方法を別に検討します。
-<!-- 
-## 8. stateをメニューの表示へ接続する
-
-stateが切り替わることを確認できたら、スマートフォン用ナビゲーションへ接続します。
-
-```jsx
-<nav
-  id="mobile-navigation"
-  className={styles.menu}
-  aria-label="モバイルナビゲーション"
-  hidden={!isMenuOpen}
->
-  {/* navigationLinksから作ったul */}
-</nav>
-```
-
-`hidden`には、非表示にする場合に`true`を渡します。
-
-```text
-isMenuOpenがfalse
-↓
-!isMenuOpenはtrue
-↓
-hidden={true}
-↓
-メニューを隠す
-```
-
-```text
-isMenuOpenがtrue
-↓
-!isMenuOpenはfalse
-↓
-hidden={false}
-↓
-メニューを表示する
-```
-
-この章で使用する`.menu`は、`hidden`がないときに表示されるよう、事前にSCSSを調整しておきます。旧HTMLで使用していた`.menu.active`による開閉は使用しません。
-
-動作は、次の順番です。
-
-```text
-ボタンを押す
-↓
-toggleMenu()を実行する
-↓
-isMenuOpenが変わる
-↓
-hiddenの値が変わる
-↓
-Reactが表示を更新する
-```
-
-JavaScriptからDOMのクラスを直接追加・削除しているのではありません。
-
-**stateを変更し、そのstateから表示を決めています。** -->
 
 ---
 
@@ -686,7 +673,7 @@ aria-controls
 
 `aria-expanded`がメニューを開閉するわけではありません。
 
-実際の表示は`isMenuOpen`から決まり、`aria-expanded`は同じ状態を支援技術へ伝えます。
+実際の表示は`isMenuOpen`から決まり、`aria-expanded`は同じ状態を支援技術（スクリーンリーダー）へ伝えます。
 
 ブラウザの開発者ツールで、ボタンを押すたびに`aria-expanded`が`false`と`true`へ変わることを確認してください。
 
@@ -696,7 +683,7 @@ aria-controls
 
 メニューボタンには、現在の状態を反転する`toggleMenu()`を使用しました。
 
-メニュー内のリンクを押した場合は、現在の状態に関係なく、必ず閉じたいので別の関数を作ります。
+メニューボタンをクリックしてモバイル・メニューが展開し、メニュー内のリンクを押した時や、展開しているモバイル・メニューを閉じたい場合に効かせる別の関数を作ります。
 
 ```jsx
 const closeMenu = () => {
@@ -707,9 +694,22 @@ const closeMenu = () => {
 モバイルナビゲーションのリンクへ渡します。
 
 ```jsx
-<a href={link.href} onClick={closeMenu}>
-  {link.label}
-</a>
+<nav className={styles.menu}>
+  <ul className="flex">
+    {
+      navigationLinks.map((link) => (
+        <li key={link.href}>
+          <a 
+            href={link.href}
+            onClick={closeMenu}
+          >
+            {link.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
 ```
 
 役割の違いを確認します。
@@ -722,7 +722,9 @@ closeMenu()
 → 現在の状態に関係なくfalseにする
 ```
 
-リンクを押したあとに、メニューが閉じることを確認してください。
+開閉のボタンをクリックすると、『OPEN』から『CLOSE』になります。
+
+メニューのリンクを押して表示が『OPEN』に切り替わることを確認してください。
 
 ---
 
@@ -749,16 +751,29 @@ src/components/
 
 import styles from "./MobileMenu.module.scss";
 
-export default function MobileMenu({ isOpen, links, onClose }) {
+export default function MobileMenu({ isOpen, onClose, links }) {
+  console.log(isOpen)
+  console.log(links)
   return (
-    <nav
+    <nav 
       id="mobile-navigation"
-      className={styles.menu}
-      aria-label="モバイルナビゲーション"
+      className={styles.mobileMenu}
+      aria-label="モバイル・ナビゲーション"
       hidden={!isOpen}
     >
-      <ul className={styles.list}>
-        {/* linksをmap()で展開する */}
+      <ul className="flex">
+        {
+          links.map((link) => (
+            <li key={link.href}>
+              <a 
+                href={link.href}
+                onClick={onClose}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
   );
@@ -773,6 +788,8 @@ Headerから呼び出します。
 import MobileMenu from "@/components/MobileMenu";
 ```
 
+`MobileMenu`コンポーネントで必要な`props`を渡します。
+
 ```jsx
 <MobileMenu
   isOpen={isMenuOpen}
@@ -781,20 +798,20 @@ import MobileMenu from "@/components/MobileMenu";
 />
 ```
 
-`MobileMenu`は三種類のpropsを受け取ります。
+`MobileMenu`コンポーネントは三種類のpropsを受け取ります。
 
 ```text
 isOpen
-→ 真偽値。表示するかを決める
+→ 『真偽値』表示するかを決める
 
 links
-→ 配列。表示するリンクを決める
+→ 『配列』表示するリンクを決める
 
 onClose
-→ 関数。リンクを押したときに呼び出す
+→ 『関数』リンクを押したときに呼び出す
 ```
 
-`MobileMenu`は自分でstateを持ちません。
+`MobileMenu`は自分で`State`を持ちません。
 
 ```text
 Header
@@ -829,23 +846,9 @@ MobileMenu
 Headerが持つisMenuOpenがfalseになる
 ```
 
-関数そのものは、HeaderからMobileMenuへpropsとして渡されています。
+関数そのものは、`Header`から`MobileMenu`へ`props`として渡されています。
 
-子の`MobileMenu`は、その関数を実行することで、親のHeaderへ「メニューを閉じてほしい」と依頼できます。
-
-stateをどちらにも持たせないことが重要です。
-
-```text
-HeaderにもisMenuOpen
-MobileMenuにもisMenuOpen
-→ 二つの状態がずれる可能性がある
-```
-
-```text
-HeaderだけがisMenuOpenを持つ
-MobileMenuはpropsで受け取る
-→ 現在の状態が一つに決まる
-```
+子の`MobileMenu`は、その関数を実行することで、親の`Header`へ「メニューを閉じてほしい」と依頼できます。
 
 ---
 
@@ -902,8 +905,6 @@ stateを正としてDOMを作る
 ```
 
 ことが、この章の中心です。
-
-動作確認用に追加した、現在の状態を表示する`p`はここで削除します。
 
 ---
 
@@ -975,399 +976,3 @@ Header
 git add .
 git commit -m "Manage mobile navigation with state"
 ```
-
-
-<!-- # 第7章　共通データとuseStateでメニューを作る
-
-## 目的
-
-PC用とスマートフォン用のナビゲーションを一つのデータから作り、`useState`でモバイルメニューの開閉を管理します。
-
-この章では、まだ共通Modalを使いません。
-
-```text
-第7章
-→ stateによって表示が変わる仕組みを理解する
-
-第8章
-→ 表示部分を実用的なModalへ置き換える
-```
-
----
-
-## 1. 同じ内容を二度書く問題
-
-PC用とスマートフォン用へリンクを直接書くと、一件追加するたびに二か所を修正する必要があります。
-
-```text
-PC Navigation
-├── Featured
-├── Dramas
-└── About
-
-Mobile Navigation
-├── Featured
-├── Dramas
-└── About
-```
-
-見た目やHTML構造が違うことは問題ではありません。問題は、同じリンク情報を二か所で管理することです。
-
----
-
-## 2. ナビゲーションの内容を配列にする
-
-```jsx
-const navigationLinks = [
-  { href: "#featured", label: "Featured" },
-  { href: "#dramas", label: "Dramas" },
-  { href: "#about", label: "About" },
-];
-```
-
-この配列には、リンク先と表示文字だけを入れます。PC用・スマートフォン用という見た目の情報は入れません。
-
----
-
-## 3. PC用ナビゲーションをmapで作る
-
-```jsx
-<nav className={styles.desktopNav} aria-label="メインナビゲーション">
-  <ul>
-    {navigationLinks.map((item) => (
-      <li key={item.href}>
-        <a href={item.href}>{item.label}</a>
-      </li>
-    ))}
-  </ul>
-</nav>
-```
-
-第6章では作品データからカードを作りました。今回はリンクデータから`li`を作っています。
-
-```text
-配列
-↓
-map()
-↓
-必要な数だけ同じ構造を作る
-```
-
-という基本は同じです。
-
----
-
-## 4. HeaderをClient Componentにする
-
-メニューボタンを押した結果を画面へ反映するため、Headerで`useState`を使います。
-
-```jsx
-"use client";
-
-import { useState } from "react";
-```
-
-`"use client"`は、このファイルをブラウザ上の操作に対応する境界にする指定です。サイト全体がブラウザだけで作られるという意味ではありません。
-
-次の状態を作ります。
-
-```jsx
-const [isMenuOpen, setIsMenuOpen] = useState(false);
-```
-
-```text
-false → 閉じている
-true  → 開いている
-```
-
-状態を変更する関数も作ります。
-
-```jsx
-const toggleMenu = () => {
-  setIsMenuOpen((current) => !current);
-};
-
-const closeMenu = () => {
-  setIsMenuOpen(false);
-};
-```
-
-```text
-toggleMenu()
-→ 現在の状態を反転する
-
-closeMenu()
-→ 必ず閉じる
-```
-
----
-
-## 5. MobileMenuを作る
-
-```text
-src/components/layout/MobileMenu/
-├── index.jsx
-└── MobileMenu.module.scss
-```
-
-```jsx
-// src/components/layout/MobileMenu/index.jsx
-import styles from "./MobileMenu.module.scss";
-
-export default function MobileMenu({ isOpen, links, onClose }) {
-  return (
-    <div
-      id="mobile-navigation"
-      className={styles.menu}
-      hidden={!isOpen}
-    >
-      <nav aria-label="モバイルナビゲーション">
-        <ul className={styles.list}>
-          {links.map((item) => (
-            <li key={item.href}>
-              <a href={item.href} onClick={onClose}>
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
-  );
-}
-```
-
-`MobileMenu`はstateを持ちません。
-
-```text
-isOpen
-→ 表示するか
-
-links
-→ 何を表示するか
-
-onClose
-→ 閉じるとき何を呼ぶか
-```
-
-をHeaderからpropsで受け取ります。
-
-```scss
-// src/components/layout/MobileMenu/MobileMenu.module.scss
-@use "@/styles/shared" as shared;
-
-.menu {
-  padding: 32px shared.$side-space;
-  background: shared.$color-background;
-
-  &[hidden] {
-    display: none;
-  }
-}
-
-.list {
-  display: grid;
-  gap: 24px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-```
-
----
-
-## 6. Header全体
-
-```jsx
-// src/components/layout/Header/index.jsx
-"use client";
-
-import { useState } from "react";
-
-import MobileMenu from "@/components/layout/MobileMenu";
-import styles from "./Header.module.scss";
-
-const navigationLinks = [
-  { href: "#featured", label: "Featured" },
-  { href: "#dramas", label: "Dramas" },
-  { href: "#about", label: "About" },
-];
-
-export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen((current) => !current);
-  };
-
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-  };
-
-  return (
-    <header className={styles.header}>
-      <div className={styles.inner}>
-        <a
-          href="#featured"
-          className={styles.logo}
-          aria-label="Drama Archive トップへ"
-        >
-          <img src="/pict/logo.svg" alt="" />
-        </a>
-
-        <nav
-          className={styles.desktopNav}
-          aria-label="メインナビゲーション"
-        >
-          <ul>
-            {navigationLinks.map((item) => (
-              <li key={item.href}>
-                <a href={item.href}>{item.label}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <button
-          type="button"
-          className={styles.menuButton}
-          onClick={toggleMenu}
-          aria-expanded={isMenuOpen}
-          aria-controls="mobile-navigation"
-        >
-          Menu
-        </button>
-      </div>
-
-      <MobileMenu
-        isOpen={isMenuOpen}
-        links={navigationLinks}
-        onClose={closeMenu}
-      />
-    </header>
-  );
-}
-```
-
-`aria-expanded`は開閉を実行する属性ではありません。現在の状態を支援技術へ伝える属性です。
-
-HeaderのCSS Moduleでは、PC用ナビゲーションとメニューボタンの表示を画面幅で切り替えます。
-
-```scss
-// src/components/layout/Header/Header.module.scssへ追加
-// 先頭の @use "@/styles/shared" as shared; は第4章で追加済みです。
-
-.logo {
-  display: block;
-  width: 180px;
-}
-
-.desktopNav {
-  display: none;
-}
-
-.menuButton {
-  min-width: 44px;
-  min-height: 44px;
-}
-
-@include shared.mq(md) {
-  .desktopNav {
-    display: block;
-  }
-
-  .menuButton {
-    display: none;
-  }
-}
-```
-
-第4章ですでに同じセレクタを移している場合は重複して追加せず、既存の指定をこの方針へ合わせます。
-
----
-
-## 7. stateを正として考える
-
-静的JavaScriptでは、DOMのクラスを直接追加・削除することがあります。
-
-```js
-element.classList.toggle("is-open");
-```
-
-Reactでは、現在の状態を先に値として持ちます。
-
-```text
-ボタンを押す
-↓
-isMenuOpenが変わる
-↓
-Reactが新しいstateを見る
-↓
-MobileMenuのhiddenが変わる
-```
-
-DOMを見て現在の状態を判断するのではなく、**stateを正として表示を作る**ことが、この章の中心です。
-
----
-
-## 8. 同じデータと同じ構造は別の話
-
-PC用とスマートフォン用には、それぞれ`map()`があります。これは問題ありません。
-
-```text
-共通にするもの
-→ href、label
-
-別にするもの
-→ HTML構造、スタイル、開閉動作
-```
-
-すべてを一つにまとめることが共通化ではありません。
-
-**同じものは一つにし、違うものは分ける。**
-
-その境界を考えることが重要です。
-
-Header以外でも同じリンクを使うようになったら、`navigationLinks`を`src/data/navigation.js`へ移すことを検討します。今はHeaderだけで使うため、同じファイル内で構いません。
-
----
-
-## 9. 確認する
-
-配列へ次の項目を一件追加します。
-
-```jsx
-{ href: "#contact", label: "Contact" }
-```
-
-PC用とスマートフォン用の両方へ反映されることを確認します。
-
-さらに、次も確認してください。
-
-- ボタンを押すと開閉する
-- `aria-expanded`が`true`と`false`に変わる
-- モバイルメニューのリンクを押すと閉じる
-- PC用ナビゲーションは影響を受けない
-
-この段階では、Escapeキー、背景クリック、フォーカス移動、スクロール停止はまだありません。次章で共通Modalとして追加します。
-
----
-
-## 今日の確認
-
-- [ ] 一つの配列からPC用とスマートフォン用を生成した
-- [ ] HeaderをClient Componentにした理由を説明できる
-- [ ] `useState`の現在値と更新関数を区別できる
-- [ ] stateから表示を決めた
-- [ ] MobileMenuへデータと関数をpropsで渡した
-- [ ] データと表示構造を分けて考えられる
-- [ ] まだModalの機能を実装していないことを確認した
-
-## Git
-
-```bash
-git add .
-git commit -m "Manage mobile navigation with state"
-``` -->
-
-
