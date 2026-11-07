@@ -361,3 +361,58 @@ a {
     aspect-ratio: 4 / 3;
   }
 }
+
+// // スクロール管理
+// .reveal {
+//   opacity: 0;
+//   transform: translateY(40px);
+//   transition: 
+//     opacity .8s ease, 
+//     transform .8s ease;
+// }
+
+// .inView {
+//   opacity: 1;
+//   transform: none;
+// }
+
+$appear-patterns: (
+  "up": translateY(100px),
+  "down": translateY(-30px),
+  "left": translateX(40px),
+  "right": translateX(-40px),
+);
+
+@each $key, $value in $appear-patterns {
+  .appear.#{$key} > .item {
+    transform: $value;
+  }
+}
+
+.appear {
+  > .item {
+    opacity: 0;
+    transition:
+      opacity .8s ease,
+      transform .8s ease;
+  }
+
+  &.inview > .item {
+    opacity: 1;
+    transform: none;
+
+    @for $i from 1 through 10 {
+      &:nth-child(#{$i}) {
+        transition-delay: $i * .2s;
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .appear > .item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
