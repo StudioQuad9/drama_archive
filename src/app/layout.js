@@ -4,7 +4,6 @@ import { Archivo, Zen_Kaku_Gothic_New, Cormorant_Garamond, Noto_Serif_JP } from 
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ScrollObserver from "@/components/ui/ScrollObserver";
 
 import "@/styles/reset.css";
 import "./globals.scss";
@@ -57,7 +56,6 @@ export default function RootLayout({ children }) {
       `}
     >
       <body>
-        <ScrollObserver />
         <Header />
         {children}
         <Footer />
