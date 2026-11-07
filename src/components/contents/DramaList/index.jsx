@@ -1,14 +1,40 @@
 // @/components/contents/DramaList/index.jsx
 
 import DramaCard from "@/components/contents/DramaCard";
+// import useScrollReveal from "@/hook/useScrollReveal";
 import styles from "./DramaList.module.scss";
 
 export default function DramaList({ dramas, onSelect, searchText, selectedGenre }) {
-  // console.log(dramas.length);
-  // console.log(searchText, selectedGenre);
+  // // 01
+  // const observerRef = useScrollReveal();
+  // // 02
+  // const { observerRef, isInView } = useScrollReveal();
+  // console.log("Dramas見出し：", isInView);
+
   return (
-    <section id="dramas">
-      <h2 className={styles.heading2}>Dramas</h2>
+    <section 
+      id="dramas"
+      className="appear up"
+    >
+      {/* 01 */}
+      {/* <h2
+        className={styles.heading2}
+        ref={observerRef}
+      > */}
+      {/* 02 */}
+      {/* <h2
+        className={`
+          ${styles.heading2}
+          reveal
+          ${isInView ? "inView" : ""}
+        `}
+        ref={observerRef}
+      > */}
+      <h2
+        className={`${styles.heading2} item`}
+      >
+        Dramas
+      </h2>
 
       {
         searchText.trim() !== "" || selectedGenre !== "all"
@@ -18,11 +44,14 @@ export default function DramaList({ dramas, onSelect, searchText, selectedGenre 
           : null
       }
 
-      <ul className={styles.list}>
+      <ul className={`${styles.list} appear up`}>
         {dramas.map((drama, index) => (
           <li
             key={drama.id}
-            className={styles.item}
+            className={`
+              ${styles.item}
+              item
+            `}
           >
             <DramaCard
               drama={drama}
