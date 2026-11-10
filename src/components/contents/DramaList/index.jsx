@@ -1,37 +1,17 @@
 // @/components/contents/DramaList/index.jsx
 
 import DramaCard from "@/components/contents/DramaCard";
-// import useScrollReveal from "@/hook/useScrollReveal";
 import styles from "./DramaList.module.scss";
 
 export default function DramaList({ dramas, onSelect, searchText, selectedGenre }) {
-  // // 01
-  // const observerRef = useScrollReveal();
-  // // 02
-  // const { observerRef, isInView } = useScrollReveal();
-  // console.log("Dramas見出し：", isInView);
-
   return (
     <section 
       id="dramas"
-      className="appear up"
     >
-      {/* 01 */}
-      {/* <h2
-        className={styles.heading2}
-        ref={observerRef}
-      > */}
-      {/* 02 */}
-      {/* <h2
-        className={`
-          ${styles.heading2}
-          reveal
-          ${isInView ? "inView" : ""}
-        `}
-        ref={observerRef}
-      > */}
       <h2
-        className={`${styles.heading2} item`}
+        className={styles.heading2}
+        // 12章　複数の要素に設定する
+        data-reveal
       >
         Dramas
       </h2>
@@ -44,7 +24,7 @@ export default function DramaList({ dramas, onSelect, searchText, selectedGenre 
           : null
       }
 
-      <ul className={`${styles.list} appear up`}>
+      <ul className={styles.list}>
         {dramas.map((drama, index) => (
           <li
             key={drama.id}
@@ -52,6 +32,8 @@ export default function DramaList({ dramas, onSelect, searchText, selectedGenre 
               ${styles.item}
               item
             `}
+            // 12章　複数の要素に設定する
+            data-reveal
           >
             <DramaCard
               drama={drama}
