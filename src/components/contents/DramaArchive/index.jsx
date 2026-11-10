@@ -54,6 +54,7 @@ export default function DramaArchive() {
   const featuredDrama = dramas.find((drama) => {
     return drama.featured;
   });
+  console.log(featuredDrama);
 
   const otherDramas = visibleDramas.filter((drama) => {
     return searchText !== "" || selectedGenre !== "all"
