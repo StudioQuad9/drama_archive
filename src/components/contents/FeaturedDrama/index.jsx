@@ -1,25 +1,32 @@
 // @/components/contents/FeaturedDrama/index.jsx
 
-import Image from "next/image";
+// import Image from "next/image";
+import ImageSlider from "@/components/ui/ImageSlider";
 import styles from "./FeaturedDrama.module.scss";
 
 export default function FeaturedDrama({ drama }) {
   if (!drama) return null;
 
+  const images = [drama.image, ...(drama.subImages ?? [])];
+
   return (
-    <section id="featured">
+    <section id="featured" className={styles.section}>
       <h2>Featured</h2>
 
       <article className={styles.featured}>
         <div className={styles.visual}>
           <div className="img-wrapper">
-            <Image
+            {/* <Image
               src={drama.image}
               alt={`${drama.title}のサムネール`}
               width={1920}
               height={1534}
               sizes="(min-width: 900px) 900px, 100vw"
               priority
+            /> */}
+            <ImageSlider
+              title={drama.title}
+              images={images}
             />
           </div>
 

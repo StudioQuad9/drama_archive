@@ -1,0 +1,20 @@
+// @/components/ui/ImageSlider/ImageSlider.module.scss
+
+@use "@/styles/shared" as *;
+
+.image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  & > img {
+    object-fit: cover;
+  }
+}
+
+.slider {
+  --swiper-navigation-size: 24px;
+  @include mq(lg) {
+    --swiper-navigation-size: 36px;
+  }
+}

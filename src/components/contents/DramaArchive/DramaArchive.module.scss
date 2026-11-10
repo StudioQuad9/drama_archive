@@ -4,5 +4,7 @@
 
 .archive {
   display: grid;
-  gap: clamp(16px, calc(4.35px + 3.107vw), 64px);
+  // gap: clamp(16px, calc(4.35px + 3.107vw), 64px);
+  gap: 0;
+  margin-bottom: 1rem;
 }

@@ -8,7 +8,10 @@
   gap: .5rem;
   width: 100%;
   max-width: 500px;
-  margin-inline: auto;
+  margin: .5rem auto 1rem;
+  @include mq(lg) {
+    margin: .5rem auto 1.5rem;
+  }
 }
 
 .field {

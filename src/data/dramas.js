@@ -9,7 +9,7 @@ export const dramas = [
     publishedAt: "2026-09-17T16:05:20+09:00",
     title: "True Detective",
     image: "/pict/truedetective.avif",
-    subimage: [
+    subImages: [
       "/pict/truedetective_sub1.webp",
       "/pict/truedetective_sub2.webp",
     ],
@@ -44,7 +44,7 @@ export const dramas = [
     publishedAt: "2026-09-16T16:05:20+09:00",
     title: "Stranger Things",
     image: "/pict/strangerthings.avif",
-    subimage: [
+    subImages: [
       "/pict/truedetective_sub1.webp",
       "/pict/truedetective_sub2.webp",
     ],
@@ -77,7 +77,7 @@ Netflixの看板ドラマの1つ。加入したらまず観てほしい名作。
     publishedAt: "2026-09-15T16:05:20+09:00",
     title: "Mindhunter",
     image: "/pict/mindhunter.avif",
-    subimage: [
+    subImages: [
       "/pict/truedetective_sub1.webp",
       "/pict/truedetective_sub2.webp",
     ],
@@ -108,7 +108,7 @@ Netflixの看板ドラマの1つ。加入したらまず観てほしい名作。
     publishedAt: "2026-09-14T16:05:20+09:00",
     title: "Mandalorian",
     image: "/pict/mandalorian.avif",
-    subimage: [
+    subImages: [
       "/pict/truedetective_sub1.webp",
       "/pict/truedetective_sub2.webp",
     ],
@@ -141,7 +141,7 @@ Netflixの看板ドラマの1つ。加入したらまず観てほしい名作。
     publishedAt: "2026-09-13T16:05:20+09:00",
     title: "Bosch",
     image: "/pict/bosch.avif",
-    subimage: [
+    subImages: [
       "/pict/truedetective_sub1.webp",
       "/pict/truedetective_sub2.webp",
     ],
@@ -174,7 +174,7 @@ Netflixの看板ドラマの1つ。加入したらまず観てほしい名作。
     publishedAt: "2026-09-12T16:05:20+09:00",
     title: "Westworld",
     image: "/pict/westworld.avif",
-    subimage: [
+    subImages: [
       "/pict/truedetective_sub1.webp",
       "/pict/truedetective_sub2.webp",
     ],
@@ -209,7 +209,7 @@ Netflixの看板ドラマの1つ。加入したらまず観てほしい名作。
     publishedAt: "2026-09-11T16:05:20+09:00",
     title: "Loki",
     image: "/pict/loki.avif",
-    subimage: [
+    subImages: [
       "/pict/truedetective_sub1.webp",
       "/pict/truedetective_sub2.webp",
     ],
@@ -238,7 +238,7 @@ Netflixの看板ドラマの1つ。加入したらまず観てほしい名作。
     publishedAt: "2026-09-10T16:05:20+09:00",
     title: "Tokyo Vice",
     image: "/pict/tokyovice.avif",
-    subimage: [
+    subImages: [
       "/pict/truedetective_sub1.webp",
       "/pict/truedetective_sub2.webp",
     ],
