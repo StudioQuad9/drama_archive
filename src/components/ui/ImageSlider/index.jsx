@@ -34,7 +34,6 @@ export default function ImageSlider({ title, images }) {
             <div className={styles.image}>
               <Image 
                 src={image}
-                // alternative text（代替テキスト）
                 alt={`${title} ${index + 1}枚目`}
                 fill
                 sizes="(min-width: 900px) 900px, 100vw"

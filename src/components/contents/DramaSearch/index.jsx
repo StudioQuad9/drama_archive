@@ -10,16 +10,13 @@ export default function DramaSearch({
   selectedGenre,
   setSelectedGenre,
 }) {
-  // 親で状態を生成して、子で更新用関数作って発火させる
   const inputSearchWord = (e) => {
     setSearchText(e.target.value)
   };
-  // console.log(searchText);
   
   const selectedGenreName = (e) => {
     setSelectedGenre(e.target.value)
   };
-  // console.log(selectedGenre);
   
   return (
     <div className={styles.search}>

@@ -7,11 +7,9 @@ import { usePathname } from "next/navigation";
 
 export default function ScrollObserver() {
   const pathName = usePathname();
-  console.log(pathName);
 
   useEffect(() => {
     const targets = document.querySelectorAll(".appear");
-    console.log(targets);
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {

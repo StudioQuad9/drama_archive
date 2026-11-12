@@ -16,14 +16,6 @@ export default function FeaturedDrama({ drama }) {
       <article className={styles.featured}>
         <div className={styles.visual}>
           <div className="img-wrapper">
-            {/* <Image
-              src={drama.image}
-              alt={`${drama.title}のサムネール`}
-              width={1920}
-              height={1534}
-              sizes="(min-width: 900px) 900px, 100vw"
-              priority
-            /> */}
             <ImageSlider
               title={drama.title}
               images={images}

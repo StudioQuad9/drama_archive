@@ -9,41 +9,11 @@ import styles from "./Modal.module.scss";
 
 export default function Modal({ isOpen, onClose, ariaLabel, children }) {
 
-  // そのままだとエラーになるので対策したものを置く。
   const [isMounted, setIsMounted] = useState(false);
   
   useEffect(() => {
-    // Portalでdocument.bodyを使うため、ブラウザ表示後に一度だけ更新する。
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
   }, []);
-
-  // console.log({ isOpen, isMounted });
-
-  // // 例1）
-  // useEffect(() => {
-  //   console.log("現在のisOpen:", isOpen)
-  // }, [isOpen]);
-  // // }, []);
-  
-  // // 例2）
-  // useEffect(() => {
-  //   if (isOpen === false) return;
-  //   console.log("現在のisOpen:", isOpen)
-  //   console.log("モーダルが開くたびに出力する")
-  // // }, []);
-  // }, [isOpen]);
-  
-  // // 例3）
-  // useEffect(() => {
-  //   if (isOpen === false) return;
-  //   // console.log(getComputedStyle(document.body).overflow);
-  //   const previousOverflow = document.body.style.overflow;
-  //   document.body.style.overflow = "hidden";
-  //   return () => {
-  //     document.body.style.overflow = previousOverflow;
-  //   };
-  // }, [isOpen]);
 
   useEffect(() => {
     if (isOpen === false) return;
@@ -68,11 +38,6 @@ export default function Modal({ isOpen, onClose, ariaLabel, children }) {
     };
   }, [isOpen, onClose]);
 
-  // メニュー（グローバルメニューのスマートフォン版）が
-  // 開いていなければ、以降の処理はせずに終了。
-  // // DOM型
-  // if (isOpen === false) return null;
-  // state型
   if (isMounted === false) return null;
 
   const handleBackdropClick = (event) => {
@@ -83,16 +48,6 @@ export default function Modal({ isOpen, onClose, ariaLabel, children }) {
 
   return createPortal(
     <div
-      // // DOM型
-      // className={`
-      //   ${styles.modal} ${isOpen ? styles.isOpen : styles.isClosed}
-      // `}
-      // role="dialog"
-      // aria-modal="true"
-      // aria-label={ariaLabel}
-      // onClick={handleBackdropClick}
-
-      // state型
       className={`
         ${styles.modal} ${isOpen ? styles.isOpen : ""}
       `}
@@ -102,16 +57,6 @@ export default function Modal({ isOpen, onClose, ariaLabel, children }) {
       aria-hidden={!isOpen}
       onClick={handleBackdropClick}
     >
-      {/* <button
-        type="button"
-        style={{
-          height: "100px",
-          backgroundColor: "red",
-        }}
-      >
-        閉じたくないボタン
-      </button> */}
-
       <button
         type="button"
         className={styles.modalBtn}

@@ -10,7 +10,6 @@ export default function DramaList({ dramas, onSelect, searchText, selectedGenre 
     >
       <h2
         className={styles.heading2}
-        // 12章　複数の要素に設定する
         data-reveal
       >
         Dramas
@@ -32,7 +31,6 @@ export default function DramaList({ dramas, onSelect, searchText, selectedGenre 
               ${styles.item}
               item
             `}
-            // 12章　複数の要素に設定する
             data-reveal
           >
             <DramaCard
