@@ -1,4 +1,6 @@
-# ローカルの管理者ログイン
+# 1-1. ローカルの管理者ログイン
+
+対応コミット：`5f8d892` — ログイン機能と原稿執筆の最低限の機能を実装する
 
 ## 今回の変更
 
@@ -42,7 +44,7 @@ Vercel公開時は別途Vercelにも接続設定を登録する。
 
 新規追加
 ＠/app/admin/DraftWorkspace.jsx：原稿一覧・入力・下書き保存・再編集
-＠/docs/commerce-engine/drafts.md：機能と確認方法の説明
+＠/docs/commerce-engine/01-2-drafts.md：機能と確認方法の説明
 既存ファイルを変更
 ＠/app/admin/AdminAccess.jsx：ログイン後に原稿画面を表示。未保存時の移動確認を追加
 ＠/admin/admin.module.scss：原稿一覧・入力画面の装飾とスマートフォン対応

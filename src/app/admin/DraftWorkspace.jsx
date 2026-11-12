@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { getBrowserSupabase } from "@/lib/supabase/browser";
 import styles from "./admin.module.scss";
 import DramaFields from "./DramaFields";
+import ArticlePreview from "./ArticlePreview";
 import { metadataToFields, fieldsToMetadata } from "@/lib/articles/drama-fields.mjs";
 
 const fields = "id,slug,type,content,metadata,revision,updated_at";
@@ -187,6 +188,10 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
           <p role="status">{dirty ? "未保存の変更があります。" : selected ? "保存済みです。" : "まだ保存していません。"}</p>
           <button type="submit" disabled={saving || uploadBusy || (!dirty && Boolean(selected))}>{saving ? "保存しています…" : "下書き保存"}</button>
         </form>
+        <details className={styles.previewDisclosure}>
+          <summary>記事プレビューを開く・閉じる</summary>
+          <ArticlePreview content={content} details={details} />
+        </details>
         {message && <p role="status">{message}</p>}
         {saveError && <p role="alert">{saveError}</p>}
       </section>

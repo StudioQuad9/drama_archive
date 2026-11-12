@@ -108,3 +108,9 @@
   progress { width: 100%; }
 }
 .imagePreview { width: 100%; height: auto; max-height: 320px; object-fit: contain; margin-top: 12px; }
+
+.previewDisclosure {
+  margin: 24px 0;
+  summary { padding: 14px 18px; background: #fff0a5; border: 2px solid #171717; cursor: pointer; font-weight: bold; }
+  summary:focus-visible { outline: 3px solid #1264a3; outline-offset: 4px; }
+}
