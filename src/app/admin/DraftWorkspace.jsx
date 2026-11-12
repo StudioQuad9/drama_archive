@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { getBrowserSupabase } from "@/lib/supabase/browser";
 import styles from "./admin.module.scss";
 import DramaFields from "./DramaFields";
+import ArticleImages from "./ArticleImages";
 import ArticlePreview from "./ArticlePreview";
+import PublicationControls from "./PublicationControls";
 import { metadataToFields, fieldsToMetadata } from "@/lib/articles/drama-fields.mjs";
 
 const fields = "id,slug,type,content,metadata,revision,updated_at";
@@ -15,6 +17,10 @@ const formatDate = (value) => new Intl.DateTimeFormat("ja-JP", {
 
 export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }) {
   const [articles, setArticles] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [listError, setListError] = useState("");
   const [selected, setSelected] = useState(null);
@@ -25,6 +31,7 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
   const [mainUploading, setMainUploading] = useState(false);
   const [extraUploading, setExtraUploading] = useState(false);
   const uploadBusy = mainUploading || extraUploading;
+  const [publishing, setPublishing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [saveError, setSaveError] = useState("");
@@ -45,33 +52,41 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
   }, [dirty, onDirtyChange]);
 
   useEffect(() => {
-    onSavingChange(saving || uploadBusy);
+    onSavingChange(saving || uploadBusy || publishing);
     return () => onSavingChange(false);
-  }, [saving, uploadBusy, onSavingChange]);
+  }, [saving, uploadBusy, publishing, onSavingChange]);
 
   useEffect(() => {
-    if (!dirty && !saving && !uploadBusy) return;
+    if (!dirty && !saving && !uploadBusy && !publishing) return;
     function warn(event) {
       event.preventDefault();
       event.returnValue = "";
     }
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty, saving, uploadBusy]);
+  }, [dirty, saving, uploadBusy, publishing]);
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
       try {
-        const { data, error } = await getBrowserSupabase()
-          .from("articles")
-          .select(fields)
-          .eq("owner_id", userId)
-          .order("updated_at", { ascending: false })
-          .limit(100);
+        let query = getBrowserSupabase().from("articles")
+          .select(fields, { count: "exact" }).eq("owner_id", userId);
+        if (search) {
+          // Quote the PostgREST value so punctuation cannot change the filter.
+          const escaped = search.replace(/[\\%_]/g, "\\$&");
+          const pattern = JSON.stringify(`%${escaped}%`);
+          query = query.or(["title", "heading", "body"].map((key) => `content->>${key}.ilike.${pattern}`).join(","));
+        }
+        const { data, error, count } = await query
+          .order("updated_at", { ascending: false }).order("id", { ascending: true })
+          .range(page * 10, page * 10 + 9);
         if (error) throw error;
         if (!cancelled) {
+          const lastPage = Math.max(0, Math.ceil((count ?? 0) / 10) - 1);
+          if (page > lastPage) setPage(lastPage);
           setArticles(data);
+          setTotal(count ?? 0);
           setListError("");
         }
       } catch {
@@ -82,10 +97,10 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
     }
     void load();
     return () => { cancelled = true; };
-  }, [userId, refresh]);
+  }, [userId, refresh, search, page]);
 
   function open(article) {
-    if (inFlight.current || uploadBusy) return;
+    if (inFlight.current || uploadBusy || publishing) return;
     if (dirty && !window.confirm("未保存の変更があります。保存せずに別の原稿を開きますか？")) return;
     const next = article ? { ...article.content } : emptyContent();
     setSelected(article);
@@ -106,7 +121,7 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
 
   async function save(event) {
     event.preventDefault();
-    if (inFlight.current || uploadBusy) return;
+    if (inFlight.current || uploadBusy || publishing) return;
     inFlight.current = true;
     setSaving(true);
     setMessage("");
@@ -137,8 +152,9 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
       const savedDetails = metadataToFields(data.metadata);
       setDetails(savedDetails);
       setDetailsBaseline(savedDetails);
-      setArticles((previous) => [data, ...previous.filter((item) => item.id !== data.id)].slice(0, 100));
-      setMessage(`下書きを保存しました（${formatDate(data.updated_at)}）。Webには公開していません。`);
+      setLoading(true);
+      setRefresh((value) => value + 1);
+      setMessage(`下書きを保存しました（${formatDate(data.updated_at)}）。公開版は変更していません。`);
     } catch (error) {
       if (active.current) setSaveError(error.message || "保存できませんでした。入力内容をコピーして保管してください。");
     } finally {
@@ -151,47 +167,71 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
     <div className={styles.workspace}>
       <section className={styles.articleList} aria-labelledby="draft-list-title">
         <h2 id="draft-list-title">保存した原稿</h2>
-        <p>更新が新しい順に最大100件表示します。</p>
+        <p>保存済み原稿全体を検索し、更新が新しい順に10件ずつ表示します。</p>
+        <form className={styles.form} onSubmit={(event) => {
+          event.preventDefault();
+          setLoading(true);
+          setPage(0);
+          setSearch(searchInput.trim());
+          setRefresh((value) => value + 1);
+        }}>
+          <label htmlFor="article-search">原稿を検索（タイトル・見出し・本文）</label>
+          <input id="article-search" type="search" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} />
+          <div className={styles.actions}>
+            <button type="submit" disabled={saving || uploadBusy || publishing}>検索</button>
+            <button type="button" disabled={saving || uploadBusy || publishing} onClick={() => {
+              setSearchInput(""); setSearch(""); setPage(0); setLoading(true); setRefresh((value) => value + 1);
+            }}>検索をクリア</button>
+          </div>
+        </form>
         <div className={styles.actions}>
-          <button type="button" onClick={() => open(null)} disabled={saving || uploadBusy}>新しい下書き</button>
-          <button type="button" disabled={loading || saving || uploadBusy} onClick={() => {
+          <button type="button" onClick={() => open(null)} disabled={saving || uploadBusy || publishing}>新しい下書き</button>
+          <button type="button" disabled={loading || saving || uploadBusy || publishing} onClick={() => {
             setLoading(true);
             setRefresh((value) => value + 1);
           }}>一覧を更新</button>
         </div>
         {loading && <p role="status">原稿を読み込んでいます…</p>}
         {listError && <p role="alert">{listError}</p>}
-        {!loading && !listError && articles.length === 0 && <p>保存した原稿はまだありません。</p>}
-        <ul>
+        {!loading && !listError && articles.length === 0 && <p>{search ? "条件に一致する原稿はありません。" : "保存した原稿はまだありません。"}</p>}
+        {!loading && !listError && <p>{total}件中 {total ? page * 10 + 1 : 0}〜{Math.min((page + 1) * 10, total)}件</p>}
+        <ul hidden={loading || Boolean(listError)}>
           {articles.map((article) => (
             <li key={article.id}>
-              <button type="button" onClick={() => open(article)} disabled={saving || uploadBusy} aria-current={selected?.id === article.id ? "true" : undefined}>
+              <button type="button" onClick={() => open(article)} disabled={saving || uploadBusy || publishing} aria-current={selected?.id === article.id ? "true" : undefined}>
                 <span>{article.content.title.trim() || "無題の原稿"}</span>
                 <small>保存：{formatDate(article.updated_at)}</small>
               </button>
             </li>
           ))}
         </ul>
+        <div className={styles.actions}>
+          <button type="button" disabled={loading || page === 0 || saving || uploadBusy || publishing} onClick={() => { setLoading(true); setPage((value) => value - 1); }}>前の10件</button>
+          <button type="button" disabled={loading || (page + 1) * 10 >= total || saving || uploadBusy || publishing} onClick={() => { setLoading(true); setPage((value) => value + 1); }}>次の10件</button>
+        </div>
+        <h2>編集中の原稿の画像</h2>
+        <p>{content.title.trim() || "無題の原稿"}の画像です。変更後は右側の下書き保存を押してください。</p>
+        <div className={styles.form}>
+          <ArticleImages key={selected?.id ?? "new"} userId={userId} onMainBusy={setMainUploading} onExtraBusy={setExtraUploading} uploadBusy={uploadBusy} values={details} onChange={(value) => { setDetails(value); setMessage(""); }} disabled={saving || publishing} />
+        </div>
       </section>
       <section aria-labelledby="draft-editor-title">
         <h2 id="draft-editor-title">{selected ? "原稿を編集" : "新しい下書き"}</h2>
         <p>ここでの保存は下書き保存です。Web公開は行いません。</p>
         <form onSubmit={save} className={styles.form}>
           <label htmlFor="draft-title">タイトル</label>
-          <input id="draft-title" name="title" value={content.title} onChange={change} disabled={saving || uploadBusy} />
+          <input id="draft-title" name="title" value={content.title} onChange={change} disabled={saving || uploadBusy || publishing} />
           <label htmlFor="draft-heading">レビュー見出し</label>
-          <input id="draft-heading" name="heading" value={content.heading} onChange={change} disabled={saving || uploadBusy} />
+          <input id="draft-heading" name="heading" value={content.heading} onChange={change} disabled={saving || uploadBusy || publishing} />
           <label htmlFor="draft-body">本文（Markdown）</label>
-          <textarea id="draft-body" name="body" rows={16} value={content.body} onChange={change} disabled={saving || uploadBusy} aria-describedby="body-help" />
+          <textarea id="draft-body" name="body" rows={16} value={content.body} onChange={change} disabled={saving || uploadBusy || publishing} aria-describedby="body-help" />
           <p id="body-help">見出しは「## 見出し」、強調は「**強調**」と書けます。文章だけでも保存できます。</p>
-          <DramaFields userId={userId} onMainBusy={setMainUploading} onExtraBusy={setExtraUploading} uploadBusy={uploadBusy} key={selected?.id ?? "new"} values={details} onChange={(value) => { setDetails(value); setMessage(""); }} disabled={saving} />
+          <DramaFields featuredRefresh={refresh} uploadBusy={uploadBusy} key={selected?.id ?? "new"} values={details} onChange={(value) => { setDetails(value); setMessage(""); }} disabled={saving || publishing} />
           <p role="status">{dirty ? "未保存の変更があります。" : selected ? "保存済みです。" : "まだ保存していません。"}</p>
-          <button type="submit" disabled={saving || uploadBusy || (!dirty && Boolean(selected))}>{saving ? "保存しています…" : "下書き保存"}</button>
+          <button type="submit" disabled={saving || uploadBusy || publishing || (!dirty && Boolean(selected))}>{saving ? "保存しています…" : "下書き保存"}</button>
         </form>
-        <details className={styles.previewDisclosure}>
-          <summary>記事プレビューを開く・閉じる</summary>
-          <ArticlePreview content={content} details={details} />
-        </details>
+        <ArticlePreview content={content} details={details} />
+        {selected ? <PublicationControls key={selected.id} article={selected} dirty={dirty} disabled={saving || uploadBusy} onBusyChange={setPublishing} onChanged={() => { setLoading(true); setRefresh((value) => value + 1); }} /> : <p>公開設定は、下書きを保存すると表示されます。</p>}
         {message && <p role="status">{message}</p>}
         {saveError && <p role="alert">{saveError}</p>}
       </section>

@@ -3,19 +3,35 @@
 @use "@/styles/shared" as *;
 
 .detail {
-  @include content-width (
-    $max-width: 800px,
-    $width: 90%
-  );
+  // Use the viewport, rather than the grid's content-sized track, as the basis.
+  width: min(800px, calc(100vw - 40px));
+  box-sizing: border-box;
+  min-width: 0;
+  margin-inline: auto;
   max-height: 100vh;
-  padding: 0 20px 20px;
+  max-height: 100dvh;
+  // 375px: 1rem → 1440px: 3rem (current root font size: 15px).
+  --detail-padding: clamp(1rem, calc(0.296rem + 2.817vw), 3rem);
+  padding: 20px var(--detail-padding) var(--detail-padding);
+  overflow-wrap: anywhere;
   background-color: rgba($color: $color-black-dark, $alpha: .9);
   overflow-y: auto;
 }
 
 .title {
-  margin-bottom: 16px;
+  margin: 0 0 16px;
   color: rgb(var(--accent));
+}
+
+.information {
+  margin: 0 0 24px;
+  padding: 0 8px;
+  color: $color-white;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.8;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .youtube {
@@ -54,4 +70,13 @@
   & a {
     color: rgb(var(--accent));
   }
+}
+
+.imagePreview {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 480px;
+  object-fit: contain;
+  margin: 0 auto 20px;
 }
