@@ -4,7 +4,7 @@
 import ImageSlider from "@/components/ui/ImageSlider";
 import styles from "./FeaturedDrama.module.scss";
 
-export default function FeaturedDrama({ drama }) {
+export default function FeaturedDrama({ drama, onSelect }) {
   if (!drama) return null;
 
   const images = [drama.image, ...(drama.subImages ?? [])];
@@ -19,29 +19,35 @@ export default function FeaturedDrama({ drama }) {
             <ImageSlider
               title={drama.title}
               images={images}
+              onSelect={() => onSelect(drama)}
             />
           </div>
 
-          <p className={styles.quote}>
+          {drama.quote && <p className={styles.quote}>
             {drama.quote}
             <br />
             —{drama.quoteBy}
-          </p>
+          </p>}
 
           <h3 className={styles.title}>
-            {drama.title}
+            <button
+              type="button"
+              onClick={() => onSelect(drama)}
+            >
+              {drama.title}
+            </button>
           </h3>
 
-          <p className={styles.score}>
+          {drama.score != null && <p className={styles.score}>
             {drama.score}/10
-          </p>
+          </p>}
         </div>
 
         <p className={styles.information}>
-          {drama.seasons} seasons /{" "}
+          {drama.seasons != null ? `${drama.seasons} seasons` : ""} /{" "}
           {drama.genres.join(" ∙ ")}
           <br />
-          {drama.year} / {drama.platform}
+          {drama.year} / {drama.platforms.join(" ∙ ")}
         </p>
       </article>
     </section>

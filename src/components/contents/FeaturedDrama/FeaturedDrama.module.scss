@@ -20,6 +20,7 @@
   position: absolute;
   top: 20px;
   right: 16px;
+  z-index: 2;
 
   margin: 0;
 
@@ -81,4 +82,19 @@
 
 .section {
   min-width: 0;
+}
+
+.title button {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.quote,
+.score {
+  pointer-events: none;
 }

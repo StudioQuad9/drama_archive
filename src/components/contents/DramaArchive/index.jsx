@@ -8,10 +8,9 @@ import DramaSearch from "@/components/contents/DramaSearch";
 import DramaList from "@/components/contents/DramaList";
 import DramaDetail from "@/components/contents/DramaDetail";
 import Modal from "@/components/ui/Modal";
-import { dramas } from "@/data/dramas"
 import styles from "./DramaArchive.module.scss";
 
-export default function DramaArchive() {
+export default function DramaArchive({ dramas = [] }) {
 
   const [selectedDrama, setSelectedDrama] = useState(null);
   const handleSelectDrama = (drama) => {
@@ -65,6 +64,7 @@ export default function DramaArchive() {
   
   return (
     <div className={styles.archive}>
+      {dramas.length === 0 && <p>公開中の記事はまだありません。</p>}
       <FeaturedDrama 
         drama={featuredDrama} 
         onSelect={handleSelectDrama}
@@ -98,6 +98,7 @@ export default function DramaArchive() {
           isDramaModalOpen &&
           selectedDrama && 
             <DramaDetail 
+              key={selectedDrama.id}
               drama={selectedDrama} 
             />
         }

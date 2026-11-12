@@ -17,10 +17,11 @@ export default function DramaCard({ drama, order, onSelect }) {
           alt={`${drama.title}のサムネール`}
           width={1920}
           height={1076}
+          unoptimized={/^https?:/.test(drama.image)}
         />
       </div>
 
-      <p className={styles.score}>{drama.score}/10</p>
+      {drama.score != null && <p className={styles.score}>{drama.score}/10</p>}
 
       <div className={styles.body}>
         <div className={styles.heading}>
@@ -31,7 +32,7 @@ export default function DramaCard({ drama, order, onSelect }) {
         </div>
 
         <p className={styles.information}>
-          {drama.seasons} seasons / {drama.genres.join(" ∙ ")}
+          {drama.seasons != null ? `${drama.seasons} seasons` : ""} / {drama.genres.join(" ∙ ")}
           <br />
           {drama.year} / {drama.platforms.join(" ∙ ")}
         </p> 

@@ -10,7 +10,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import styles from "./ImageSlider.module.scss";
 
-export default function ImageSlider({ title, images }) {
+export default function ImageSlider({ title, images, onSelect }) {
   if (!images?.length) return null;
 
   return (
@@ -27,6 +27,11 @@ export default function ImageSlider({ title, images }) {
         // 自動再生を続けるかの設定
         disableOnInteraction: false,
       }}
+      onClick={(swiper, event) => {
+        if (swiper.allowClick && event.target.closest(".swiper-slide")) {
+          onSelect?.();
+        }
+      }}
     >
       {
         images.map((image, index) => (
@@ -36,6 +41,7 @@ export default function ImageSlider({ title, images }) {
                 src={image}
                 alt={`${title} ${index + 1}枚目`}
                 fill
+                unoptimized={/^https?:/.test(image)}
                 sizes="(min-width: 900px) 900px, 100vw"
                 priority={index === 0}
               />
