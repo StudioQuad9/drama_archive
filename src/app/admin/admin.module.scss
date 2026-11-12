@@ -71,3 +71,31 @@
 @media (max-width: 720px) {
   .workspace { grid-template-columns: minmax(0, 1fr); }
 }
+
+.metadataGroup {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  border: 1px solid #aaa;
+  padding: 20px;
+  margin-top: 16px;
+  legend { padding: 0 8px; font-weight: bold; }
+  label { display: block; margin-bottom: 8px; }
+  textarea { min-height: 90px; }
+  p { margin-bottom: 0; font-size: 0.9rem; }
+  .checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    input { width: 20px; height: 20px; padding: 0; flex-shrink: 0; }
+  }
+}
+.numberFields {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 560px) {
+  .numberFields { grid-template-columns: minmax(0, 1fr); }
+  .metadataGroup { padding: 12px; }
+}

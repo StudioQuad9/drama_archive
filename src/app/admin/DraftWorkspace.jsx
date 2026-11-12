@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { getBrowserSupabase } from "@/lib/supabase/browser";
 import styles from "./admin.module.scss";
+import DramaFields from "./DramaFields";
+import { metadataToFields, fieldsToMetadata } from "@/lib/articles/drama-fields.mjs";
 
 const fields = "id,slug,type,content,metadata,revision,updated_at";
 const emptyContent = () => ({ title: "", heading: "", body: "", bodyFormat: "markdown" });
@@ -17,13 +19,16 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
   const [selected, setSelected] = useState(null);
   const [content, setContent] = useState(emptyContent);
   const [baseline, setBaseline] = useState(emptyContent);
+  const [details, setDetails] = useState(() => metadataToFields());
+  const [detailsBaseline, setDetailsBaseline] = useState(() => metadataToFields());
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [saveError, setSaveError] = useState("");
   const [refresh, setRefresh] = useState(0);
   const inFlight = useRef(false);
   const active = useRef(true);
-  const dirty = JSON.stringify(content) !== JSON.stringify(baseline);
+  const dirty = JSON.stringify(content) !== JSON.stringify(baseline)
+    || JSON.stringify(details) !== JSON.stringify(detailsBaseline);
 
   useEffect(() => {
     active.current = true;
@@ -82,6 +87,9 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
     setSelected(article);
     setContent(next);
     setBaseline(next);
+    const nextDetails = metadataToFields(article?.metadata);
+    setDetails(nextDetails);
+    setDetailsBaseline(nextDetails);
     setMessage("");
     setSaveError("");
   }
@@ -100,15 +108,16 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
     setMessage("");
     setSaveError("");
     try {
+      const metadata = fieldsToMetadata(details, selected?.metadata);
       const supabase = getBrowserSupabase();
       const query = selected
-        ? supabase.from("articles").update({ content })
+        ? supabase.from("articles").update({ content, metadata })
           .eq("id", selected.id).eq("revision", selected.revision)
         : supabase.from("articles").insert({
           slug: `draft-${crypto.randomUUID()}`,
           type: "drama-review",
           content,
-          metadata: {},
+          metadata,
         });
       const { data, error } = await query.select(fields).single();
       if (error) {
@@ -121,6 +130,9 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
       setSelected(data);
       setContent(data.content);
       setBaseline(data.content);
+      const savedDetails = metadataToFields(data.metadata);
+      setDetails(savedDetails);
+      setDetailsBaseline(savedDetails);
       setArticles((previous) => [data, ...previous.filter((item) => item.id !== data.id)].slice(0, 100));
       setMessage(`下書きを保存しました（${formatDate(data.updated_at)}）。Webには公開していません。`);
     } catch (error) {
@@ -168,6 +180,7 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
           <label htmlFor="draft-body">本文（Markdown）</label>
           <textarea id="draft-body" name="body" rows={16} value={content.body} onChange={change} disabled={saving} aria-describedby="body-help" />
           <p id="body-help">見出しは「## 見出し」、強調は「**強調**」と書けます。文章だけでも保存できます。</p>
+          <DramaFields values={details} onChange={(value) => { setDetails(value); setMessage(""); }} disabled={saving} />
           <p role="status">{dirty ? "未保存の変更があります。" : selected ? "保存済みです。" : "まだ保存していません。"}</p>
           <button type="submit" disabled={saving || (!dirty && Boolean(selected))}>{saving ? "保存しています…" : "下書き保存"}</button>
         </form>
