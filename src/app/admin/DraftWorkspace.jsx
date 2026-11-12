@@ -21,6 +21,9 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
   const [baseline, setBaseline] = useState(emptyContent);
   const [details, setDetails] = useState(() => metadataToFields());
   const [detailsBaseline, setDetailsBaseline] = useState(() => metadataToFields());
+  const [mainUploading, setMainUploading] = useState(false);
+  const [extraUploading, setExtraUploading] = useState(false);
+  const uploadBusy = mainUploading || extraUploading;
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [saveError, setSaveError] = useState("");
@@ -41,19 +44,19 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
   }, [dirty, onDirtyChange]);
 
   useEffect(() => {
-    onSavingChange(saving);
+    onSavingChange(saving || uploadBusy);
     return () => onSavingChange(false);
-  }, [saving, onSavingChange]);
+  }, [saving, uploadBusy, onSavingChange]);
 
   useEffect(() => {
-    if (!dirty && !saving) return;
+    if (!dirty && !saving && !uploadBusy) return;
     function warn(event) {
       event.preventDefault();
       event.returnValue = "";
     }
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty, saving]);
+  }, [dirty, saving, uploadBusy]);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,7 +84,7 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
   }, [userId, refresh]);
 
   function open(article) {
-    if (inFlight.current) return;
+    if (inFlight.current || uploadBusy) return;
     if (dirty && !window.confirm("未保存の変更があります。保存せずに別の原稿を開きますか？")) return;
     const next = article ? { ...article.content } : emptyContent();
     setSelected(article);
@@ -102,7 +105,7 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
 
   async function save(event) {
     event.preventDefault();
-    if (inFlight.current) return;
+    if (inFlight.current || uploadBusy) return;
     inFlight.current = true;
     setSaving(true);
     setMessage("");
@@ -149,8 +152,8 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
         <h2 id="draft-list-title">保存した原稿</h2>
         <p>更新が新しい順に最大100件表示します。</p>
         <div className={styles.actions}>
-          <button type="button" onClick={() => open(null)} disabled={saving}>新しい下書き</button>
-          <button type="button" disabled={loading || saving} onClick={() => {
+          <button type="button" onClick={() => open(null)} disabled={saving || uploadBusy}>新しい下書き</button>
+          <button type="button" disabled={loading || saving || uploadBusy} onClick={() => {
             setLoading(true);
             setRefresh((value) => value + 1);
           }}>一覧を更新</button>
@@ -161,7 +164,7 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
         <ul>
           {articles.map((article) => (
             <li key={article.id}>
-              <button type="button" onClick={() => open(article)} disabled={saving} aria-current={selected?.id === article.id ? "true" : undefined}>
+              <button type="button" onClick={() => open(article)} disabled={saving || uploadBusy} aria-current={selected?.id === article.id ? "true" : undefined}>
                 <span>{article.content.title.trim() || "無題の原稿"}</span>
                 <small>保存：{formatDate(article.updated_at)}</small>
               </button>
@@ -174,15 +177,15 @@ export default function DraftWorkspace({ userId, onDirtyChange, onSavingChange }
         <p>ここでの保存は下書き保存です。Web公開は行いません。</p>
         <form onSubmit={save} className={styles.form}>
           <label htmlFor="draft-title">タイトル</label>
-          <input id="draft-title" name="title" value={content.title} onChange={change} disabled={saving} />
+          <input id="draft-title" name="title" value={content.title} onChange={change} disabled={saving || uploadBusy} />
           <label htmlFor="draft-heading">レビュー見出し</label>
-          <input id="draft-heading" name="heading" value={content.heading} onChange={change} disabled={saving} />
+          <input id="draft-heading" name="heading" value={content.heading} onChange={change} disabled={saving || uploadBusy} />
           <label htmlFor="draft-body">本文（Markdown）</label>
-          <textarea id="draft-body" name="body" rows={16} value={content.body} onChange={change} disabled={saving} aria-describedby="body-help" />
+          <textarea id="draft-body" name="body" rows={16} value={content.body} onChange={change} disabled={saving || uploadBusy} aria-describedby="body-help" />
           <p id="body-help">見出しは「## 見出し」、強調は「**強調**」と書けます。文章だけでも保存できます。</p>
-          <DramaFields values={details} onChange={(value) => { setDetails(value); setMessage(""); }} disabled={saving} />
+          <DramaFields userId={userId} onMainBusy={setMainUploading} onExtraBusy={setExtraUploading} uploadBusy={uploadBusy} key={selected?.id ?? "new"} values={details} onChange={(value) => { setDetails(value); setMessage(""); }} disabled={saving} />
           <p role="status">{dirty ? "未保存の変更があります。" : selected ? "保存済みです。" : "まだ保存していません。"}</p>
-          <button type="submit" disabled={saving || (!dirty && Boolean(selected))}>{saving ? "保存しています…" : "下書き保存"}</button>
+          <button type="submit" disabled={saving || uploadBusy || (!dirty && Boolean(selected))}>{saving ? "保存しています…" : "下書き保存"}</button>
         </form>
         {message && <p role="status">{message}</p>}
         {saveError && <p role="alert">{saveError}</p>}

@@ -1,3 +1,4 @@
+import ImageUpload, { ImagePreview } from "./ImageUpload";
 import styles from "./admin.module.scss";
 
 const numbers = [
@@ -10,14 +11,14 @@ const lists = [
   { name: "platforms", label: "配信先", example: "HBO\nNetflix" },
 ];
 
-export default function DramaFields({ values, onChange, disabled }) {
+export default function DramaFields({ values, onChange, disabled, userId, onMainBusy, onExtraBusy, uploadBusy }) {
   function change(event) {
     const { name, value, checked, type } = event.target;
     onChange({ ...values, [name]: type === "checkbox" ? checked : value });
   }
   return (
     <>
-      <fieldset className={styles.metadataGroup} disabled={disabled}>
+      <fieldset className={styles.metadataGroup} disabled={disabled || uploadBusy}>
         <legend>作品情報</legend>
         <p>下書きでは未入力でも保存できます。</p>
         <div className={styles.numberFields}>
@@ -40,7 +41,7 @@ export default function DramaFields({ values, onChange, disabled }) {
         </label>
         <p>表示への反映は公開機能の追加後に行います。</p>
       </fieldset>
-      <fieldset className={styles.metadataGroup} disabled={disabled}>
+      <fieldset className={styles.metadataGroup} disabled={disabled || uploadBusy}>
         <legend>引用と動画</legend>
         <label htmlFor="drama-quote">引用文</label>
         <textarea id="drama-quote" name="quote" rows={3} value={values.quote} onChange={change} />
@@ -52,11 +53,14 @@ export default function DramaFields({ values, onChange, disabled }) {
       </fieldset>
       <fieldset className={styles.metadataGroup} disabled={disabled}>
         <legend>画像</legend>
-        <p>すでに置いてある画像のパスやURLを入力できます。ファイルのアップロードは次の段階で追加します。</p>
+        <p>ファイルを選ぶとアップロードが始まります。完了後に下書き保存を押してください。</p>
+        <ImageUpload userId={userId} label="メイン画像をアップロード" value={values.image} disabled={disabled || uploadBusy} onBusyChange={onMainBusy} onUploaded={(reference) => onChange({ ...values, image: reference })} />
+        <ImageUpload userId={userId} label="追加画像をアップロード（1枚ずつ）" value="" disabled={disabled || uploadBusy} onBusyChange={onExtraBusy} onUploaded={(reference) => onChange({ ...values, subImages: [values.subImages.trim(), reference].filter(Boolean).join("\n") })} />
         <label htmlFor="drama-image">メイン画像</label>
-        <input id="drama-image" name="image" value={values.image} onChange={change} placeholder="/pict/truedetective.avif" />
+        <input id="drama-image" name="image" disabled={uploadBusy} value={values.image} onChange={change} placeholder="/pict/truedetective.avif" />
         <label htmlFor="drama-subImages">追加画像（1行に1画像）</label>
-        <textarea id="drama-subImages" name="subImages" rows={3} value={values.subImages} onChange={change} placeholder="/pict/truedetective_sub1.webp" />
+        <textarea id="drama-subImages" name="subImages" disabled={uploadBusy} rows={3} value={values.subImages} onChange={change} placeholder="/pict/truedetective_sub1.webp" />
+        {values.subImages.split(/\r?\n/).map((value) => value.trim()).filter(Boolean).map((value, index) => <ImagePreview key={`${index}-${value}`} value={value} />)}
       </fieldset>
     </>
   );

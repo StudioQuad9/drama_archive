@@ -1,3 +1,5 @@
+import { parseImageReference } from "../uploads/image-file.mjs";
+
 // Input fields are strings; stored metadata uses numbers, arrays and booleans.
 export function metadataToFields(metadata = {}) {
   return {
@@ -27,6 +29,7 @@ function number(value, label, min, max = Infinity) {
 function imageLocation(value) {
   const location = value.trim();
   if (!location) return location;
+  if (parseImageReference(location)) return location;
   if (location.startsWith("/") && !location.startsWith("//") && !location.includes("\\")) return location;
   try {
     const url = new URL(location);

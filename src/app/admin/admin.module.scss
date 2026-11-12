@@ -99,3 +99,12 @@
   .numberFields { grid-template-columns: minmax(0, 1fr); }
   .metadataGroup { padding: 12px; }
 }
+
+.uploadBox {
+  border: 1px dashed #777;
+  padding: 16px;
+  min-width: 0;
+  input[type="file"] { margin-top: 8px; }
+  progress { width: 100%; }
+}
+.imagePreview { width: 100%; height: auto; max-height: 320px; object-fit: contain; margin-top: 12px; }
