@@ -41,7 +41,7 @@ export default function ImageSlider({ title, images, onSelect }) {
                 src={image}
                 alt={`${title} ${index + 1}枚目`}
                 fill
-                unoptimized={/^https?:/.test(image)}
+                unoptimized={/^https?:/.test(image) || image.startsWith("/api/article-images/")}
                 sizes="(min-width: 900px) 900px, 100vw"
                 priority={index === 0}
               />

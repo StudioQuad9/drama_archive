@@ -17,7 +17,7 @@ export default function DramaCard({ drama, order, onSelect }) {
           alt={`${drama.title}のサムネール`}
           width={1920}
           height={1076}
-          unoptimized={/^https?:/.test(drama.image)}
+          unoptimized={/^https?:/.test(drama.image) || drama.image.startsWith("/api/article-images/")}
         />
       </div>
 

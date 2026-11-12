@@ -1,12 +1,15 @@
+import { parseImageReference } from "../uploads/image-file.mjs";
 import { manuscriptToDrama } from "./drama-adapter.mjs";
 
 const imageForPublicPage = (value) => {
   if (typeof value !== "string") return "";
+  const stored = parseImageReference(value);
+  if (stored) return `/api/article-images/${stored.path.split("/").map(encodeURIComponent).join("/")}`;
   if (value.startsWith("/") && !value.startsWith("//") && !value.includes("\\")) return value;
   try {
     const url = new URL(value);
     if (["https:", "http:"].includes(url.protocol) && !url.username && !url.password) return value;
-  } catch { /* Private Storage references will be served in the next step. */ }
+  } catch { /* Ignore unsupported image locations. */ }
   return "";
 };
 const strings = (value) => Array.isArray(value) ? value.filter((item) => typeof item === "string") : [];
